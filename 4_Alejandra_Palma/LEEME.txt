@@ -1,2 +1,0 @@
-Alejandra: git pull, pega el contenido de app_parte4.py AL FINAL de app.py (incluye el cierre if __name__), agrega templates/resumen.html y static/style.css.
-Commit sugerido: Resumen con bucle, decision y contadores, y hoja de estilos
