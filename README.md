@@ -14,8 +14,8 @@ python app.py
 (En Windows, si `pip` no se reconoce: `py -m pip install -r requirements.txt` y `py app.py`.)
 4. Abrir en el navegador:
 - http://127.0.0.1:5000/empleados
-- http://127.0.0.1:5000/empleados?q=ana- http://127.0.0.1:5000/empleados/nuevo
-- http://127.0.0.1:5000/resumen
+- http://127.0.0.1:5000/empleados?q=ana  (búsqueda)
+- http://127.0.0.1:5000/empleados/nuevo
 
 La conexión usa `host=localhost, user=root, password=""` (valores por defecto de XAMPP).
 
@@ -25,7 +25,7 @@ app.py            rutas de Flask y lógica (mysql-connector-python, parámetros 
 crear_bd.sql      crea la base, las tablas y carga los datos de ejemplo
 requirements.txt  flask y mysql-connector-python
 README.md         documentación
-templates/        base.html, empleados.html, nuevo.html, editar.html, resumen.html
+templates/        base.html, empleados.html, nuevo.html, editar.html, resumen.html, detalle.html
 static/           style.css (única hoja de estilos)
 ```
 
@@ -53,6 +53,5 @@ Lee todos los empleados y los recorre con `for`. Para cada uno consulta sus docu
 ## Mejoras individuales (una rama y un pull request por integrante)
 - **Mariana Salazar** (GitHub: `marianasalazar17`): conexión a MySQL y estructura del repositorio. Mejora: página de detalle de cada empleado (/empleados/<id>) con sus datos y el estado de sus documentos.
 - **Fiorella Funes** (GitHub: _(completar)_): registro con validación y eliminación. Mejora: _(completar)_
-- - **Fernanda Pocasangre** (GitHub: `fernandapocaa-tech`): consulta con JOIN y modificación con validación. Mejora: _(completar)_
-- **Fernanda Pocasangre** (GitHub: `fernandapocaa-tech`): consulta con JOIN y modificación con validación. Mejora: _(completar)_
+- **Fernanda Pocasangre** (GitHub: `fernandapocaa-tech`): consulta con JOIN y modificación con validación. Mejora: búsqueda por texto en el listado (/empleados?q=...) con LIKE; filtra por nombre o perfil.
 - **Alejandra Palma** (GitHub: _(completar)_): resumen (bucle, decisión y contadores). Mejora: _(completar)_
