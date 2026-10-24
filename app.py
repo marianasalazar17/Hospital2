@@ -1,4 +1,4 @@
-f# app.py - Expedientes Digitales, Hospital de Diagnóstico (Desafío 2: MySQL)
+# app.py - Expedientes Digitales, Hospital de Diagnóstico (Desafío 2: MySQL)
 import mysql.connector
 from datetime import datetime
 from flask import Flask, render_template, request, redirect
