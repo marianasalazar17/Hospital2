@@ -94,7 +94,8 @@ def eliminar(emp_id):
 # FERNANDA POCASANGRE: consultar con JOIN
 # ---------------------------------------------------------------
 @app.route("/empleados")
-def listar():
+def listar():    # MEJORA INDIVIDUAL: el texto escrito en el buscador (?q=...) filtra por nombre o perfil
+    q = request.args.get("q", "").strip()
     conexion = conectar()
     cursor = conexion.cursor(dictionary=True)
 
@@ -106,7 +107,11 @@ def listar():
     # Consulta con JOIN: cada empleado junto con sus documentos
     consulta = ("SELECT e.id, e.nombre, e.perfil, d.id AS doc_id, d.documento, d.estado "
                 "FROM empleados e LEFT JOIN documentos d ON d.empleado_id = e.id ")
-    cursor.execute(consulta + "ORDER BY e.id, d.id")
+        if q != "":
+        consulta = consulta + "WHERE e.nombre LIKE %s OR e.perfil LIKE %s "
+        cursor.execute(consulta + "ORDER BY e.id, d.id", ("%" + q + "%", "%" + q + "%"))
+    else:
+        cursor.execute(consulta + "ORDER BY e.id, d.id")
     registros = cursor.fetchall()
     cursor.close()
     conexion.close()
