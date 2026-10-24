@@ -1,5 +1,5 @@
-# app.py - Expedientes Digitales, Hospital de Diagnóstico (Fase 2)
-import sqlite3
+# app.py - Expedientes Digitales, Hospital de Diagnóstico (Desafío 2: MySQL)
+import mysql.connector
 from datetime import datetime
 from flask import Flask, render_template, request, redirect
 
@@ -7,19 +7,16 @@ app = Flask(__name__)
 
 
 # ---------------------------------------------------------------
-# MARIANA SALAZAR: conexión a la base de datos
+# MARIANA SALAZAR: conexión a MySQL (XAMPP: usuario root, sin contraseña)
 # ---------------------------------------------------------------
 def conectar():
-    conexion = sqlite3.connect("hospital.db")
-    conexion.row_factory = sqlite3.Row
-    return conexion
+    return mysql.connector.connect(host="localhost", user="root", password="", database="hospital")
 
 
-def obtener_perfiles(conexion):
-    filas = conexion.execute(
-        "SELECT perfil FROM checklist GROUP BY perfil ORDER BY MIN(id)").fetchall()
+def obtener_perfiles(cursor):
+    cursor.execute("SELECT perfil FROM checklist GROUP BY perfil ORDER BY MIN(id)")
     lista = []
-    for fila in filas:
+    for fila in cursor.fetchall():
         lista.append(fila["perfil"])
     return lista
 
@@ -29,11 +26,14 @@ def inicio():
     return redirect("/empleados")
 
 
+# ---------------------------------------------------------------
 # FIORELLA FUNES: registrar empleado (con validación) y eliminar
+# ---------------------------------------------------------------
 @app.route("/empleados/nuevo", methods=["GET", "POST"])
 def nuevo():
     conexion = conectar()
-    perfiles = obtener_perfiles(conexion)
+    cursor = conexion.cursor(dictionary=True)
+    perfiles = obtener_perfiles(cursor)
     error = ""
     datos = {"nombre": "", "perfil": "", "fecha_ingreso": "", "correo": ""}
 
@@ -59,20 +59,21 @@ def nuevo():
         elif "@" not in correo or "." not in correo:
             error = "Escribe un correo válido (ejemplo: nombre@hospital.com)."
         else:
-            cursor = conexion.execute(
-                "INSERT INTO empleados (nombre, perfil, fecha_ingreso, correo) VALUES (?, ?, ?, ?)",
+            cursor.execute(
+                "INSERT INTO empleados (nombre, perfil, fecha_ingreso, correo) VALUES (%s, %s, %s, %s)",
                 (nombre, perfil, fecha, correo))
             emp_id = cursor.lastrowid
-            requeridos = conexion.execute(
-                "SELECT documento FROM checklist WHERE perfil = ?", (perfil,)).fetchall()
-            for r in requeridos:
-                conexion.execute(
-                    "INSERT INTO documentos (empleado_id, documento, estado) VALUES (?, ?, ?)",
+            cursor.execute("SELECT documento FROM checklist WHERE perfil = %s", (perfil,))
+            for r in cursor.fetchall():
+                cursor.execute(
+                    "INSERT INTO documentos (empleado_id, documento, estado) VALUES (%s, %s, %s)",
                     (emp_id, r["documento"], "Pendiente"))
             conexion.commit()
+            cursor.close()
             conexion.close()
             return redirect("/empleados")
 
+    cursor.close()
     conexion.close()
     return render_template("nuevo.html", error=error, perfiles=perfiles, datos=datos)
 
@@ -80,40 +81,55 @@ def nuevo():
 @app.route("/empleados/eliminar/<int:emp_id>", methods=["POST"])
 def eliminar(emp_id):
     conexion = conectar()
-    conexion.execute("DELETE FROM documentos WHERE empleado_id = ?", (emp_id,))
-    conexion.execute("DELETE FROM empleados WHERE id = ?", (emp_id,))
+    cursor = conexion.cursor()
+    # ON DELETE CASCADE borra solo los documentos del empleado (no quedan huérfanos)
+    cursor.execute("DELETE FROM empleados WHERE id = %s", (emp_id,))
     conexion.commit()
+    cursor.close()
     conexion.close()
     return redirect("/empleados")
 
-# FERNANDA POCASANGRE: consultar (listado con el estado del expediente)
+
+# ---------------------------------------------------------------
+# FERNANDA POCASANGRE: consultar con JOIN
+# ---------------------------------------------------------------
 @app.route("/empleados")
 def listar():
     conexion = conectar()
-    empleados = conexion.execute("SELECT * FROM empleados ORDER BY id").fetchall()
-    filas_docs = conexion.execute(
-        "SELECT documento FROM checklist GROUP BY documento ORDER BY MIN(id)").fetchall()
+    cursor = conexion.cursor(dictionary=True)
+
+    cursor.execute("SELECT documento FROM checklist GROUP BY documento ORDER BY MIN(id)")
     todos = []
-    for fila in filas_docs:
+    for fila in cursor.fetchall():
         todos.append(fila["documento"])
 
-    filas = []
-    for emp in empleados:
-        docs = conexion.execute(
-            "SELECT id, documento, estado FROM documentos WHERE empleado_id = ?",
-            (emp["id"],)).fetchall()
-        por_doc = {}
-        for d in docs:
-            por_doc[d["documento"]] = d
+    # Consulta con JOIN: cada empleado junto con sus documentos
+    consulta = ("SELECT e.id, e.nombre, e.perfil, d.id AS doc_id, d.documento, d.estado "
+                "FROM empleados e LEFT JOIN documentos d ON d.empleado_id = e.id ")
+    cursor.execute(consulta + "ORDER BY e.id, d.id")
+    registros = cursor.fetchall()
+    cursor.close()
+    conexion.close()
 
+    # Se agrupan las filas del JOIN por empleado
+    empleados = {}
+    for r in registros:
+        if r["id"] not in empleados:
+            empleados[r["id"]] = {"emp": r, "docs": {}}
+        if r["documento"] is not None:
+            empleados[r["id"]]["docs"][r["documento"]] = r
+
+    filas = []
+    for emp_id in empleados:
+        info = empleados[emp_id]
         celdas = []
         pendientes = 0
         for nombre_doc in todos:
-            if nombre_doc in por_doc:
-                d = por_doc[nombre_doc]
+            if nombre_doc in info["docs"]:
+                d = info["docs"][nombre_doc]
                 if d["estado"] == "Pendiente":
                     pendientes = pendientes + 1
-                celdas.append({"estado": d["estado"], "id": d["id"]})
+                celdas.append({"estado": d["estado"], "id": d["doc_id"]})
             else:
                 celdas.append({"estado": "No aplica", "id": None})
 
@@ -121,20 +137,24 @@ def listar():
             expediente = "Completo"
         else:
             expediente = "Incompleto"
-        filas.append({"emp": emp, "celdas": celdas, "expediente": expediente})
+        filas.append({"emp": info["emp"], "celdas": celdas, "expediente": expediente})
 
-    conexion.close()
     return render_template("empleados.html", filas=filas, documentos=todos)
 
 
+# ---------------------------------------------------------------
 # FERNANDA POCASANGRE: modificar el estado de un documento (con validación)
+# ---------------------------------------------------------------
 @app.route("/documentos/editar/<int:doc_id>", methods=["GET", "POST"])
 def editar(doc_id):
     conexion = conectar()
-    doc = conexion.execute(
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute(
         "SELECT d.id, d.documento, d.estado, e.nombre FROM documentos d "
-        "JOIN empleados e ON e.id = d.empleado_id WHERE d.id = ?", (doc_id,)).fetchone()
+        "JOIN empleados e ON e.id = d.empleado_id WHERE d.id = %s", (doc_id,))
+    doc = cursor.fetchone()
     if doc is None:
+        cursor.close()
         conexion.close()
         return redirect("/empleados")
 
@@ -144,21 +164,26 @@ def editar(doc_id):
         if estado != "Completo" and estado != "Pendiente":
             error = "Elige un estado: Completo o Pendiente."
         else:
-            conexion.execute("UPDATE documentos SET estado = ? WHERE id = ?", (estado, doc_id))
+            cursor.execute("UPDATE documentos SET estado = %s WHERE id = %s", (estado, doc_id))
             conexion.commit()
+            cursor.close()
             conexion.close()
             return redirect("/empleados")
 
+    cursor.close()
     conexion.close()
     return render_template("editar.html", doc=doc, error=error)
 
 
-
+# ---------------------------------------------------------------
 # ALEJANDRA PALMA: resumen con repetición, decisión y contadores
+# ---------------------------------------------------------------
 @app.route("/resumen")
 def resumen():
     conexion = conectar()
-    empleados = conexion.execute("SELECT * FROM empleados ORDER BY id").fetchall()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM empleados ORDER BY id")
+    empleados = cursor.fetchall()
 
     completos = 0
     incompletos = 0
@@ -166,8 +191,8 @@ def resumen():
     detalle = []
 
     for emp in empleados:
-        docs = conexion.execute(
-            "SELECT estado FROM documentos WHERE empleado_id = ?", (emp["id"],)).fetchall()
+        cursor.execute("SELECT estado FROM documentos WHERE empleado_id = %s", (emp["id"],))
+        docs = cursor.fetchall()
         total = len(docs)
         pendientes = 0
         for d in docs:
@@ -191,6 +216,7 @@ def resumen():
                         "pendientes": pendientes, "total": total,
                         "clase": clase, "texto": texto})
 
+    cursor.close()
     conexion.close()
     return render_template("resumen.html", detalle=detalle, completos=completos,
                            incompletos=incompletos, sin_checklist=sin_checklist,
