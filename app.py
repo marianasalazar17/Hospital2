@@ -139,7 +139,8 @@ def listar():
             expediente = "Incompleto"
         filas.append({"emp": info["emp"], "celdas": celdas, "expediente": expediente})
 
-    return render_template("empleados.html", filas=filas, documentos=todos)
+        return render_template("empleados.html", filas=filas, documentos=todos, q=q)
+
 
 
 # ---------------------------------------------------------------
