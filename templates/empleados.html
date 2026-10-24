@@ -3,6 +3,11 @@
 {% block contenido %}
 <h1>Expedientes digitales del personal</h1>
 <p class="sub">Hospital de Diagnóstico</p>
+<form method="GET" action="/empleados" class="buscador">
+<input type="text" name="q" value="{{ q }}" placeholder="Buscar por nombre o perfil">
+<button type="submit">Buscar</button>
+{% if q %}<a href="/empleados">Quitar filtro</a>{% endif %}
+</form>
 <table>
 <tr>
 <th>Empleado</th><th>Perfil</th>
@@ -27,5 +32,5 @@
 </tr>
 {% endfor %}
 </table>
-{% if filas|length == 0 %}<p>No hay empleados registrados.</p>{% endif %}
+<p>{% if q %}No se encontraron empleados con "{{ q }}".{% else %}No hay empleados registrados.{% endif %}</p>
 {% endblock %}
