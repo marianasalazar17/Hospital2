@@ -108,7 +108,7 @@ def listar():
     # Consulta con JOIN: cada empleado junto con sus documentos
     consulta = ("SELECT e.id, e.nombre, e.perfil, d.id AS doc_id, d.documento, d.estado "
                 "FROM empleados e LEFT JOIN documentos d ON d.empleado_id = e.id ")
-         if q != "":
+    if q != "":
         consulta = consulta + "WHERE e.nombre LIKE %s OR e.perfil LIKE %s "
         cursor.execute(consulta + "ORDER BY e.id, d.id", ("%" + q + "%", "%" + q + "%"))
     else:
