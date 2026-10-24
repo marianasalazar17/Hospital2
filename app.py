@@ -94,7 +94,8 @@ def eliminar(emp_id):
 # FERNANDA POCASANGRE: consultar con JOIN
 # ---------------------------------------------------------------
 @app.route("/empleados")
-def listar():
+def listar():    # MEJORA INDIVIDUAL: el texto escrito en el buscador (?q=...) filtra por nombre o perfil
+    q = request.args.get("q", "").strip()
     conexion = conectar()
     cursor = conexion.cursor(dictionary=True)
 
