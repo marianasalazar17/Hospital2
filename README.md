@@ -53,5 +53,6 @@ Lee todos los empleados y los recorre con `for`. Para cada uno consulta sus docu
 ## Mejoras individuales (una rama y un pull request por integrante)
 - **Mariana Salazar** (GitHub: `marianasalazar17`): conexión a MySQL y estructura del repositorio. Mejora: página de detalle de cada empleado (/empleados/<id>) con sus datos y el estado de sus documentos.
 - **Fiorella Funes** (GitHub: _(completar)_): registro con validación y eliminación. Mejora: _(completar)_
+- - **Fernanda Pocasangre** (GitHub: `fernandapocaa-tech`): consulta con JOIN y modificación con validación. Mejora: _(completar)_
 - **Fernanda Pocasangre** (GitHub: `fernandapocaa-tech`): consulta con JOIN y modificación con validación. Mejora: _(completar)_
 - **Alejandra Palma** (GitHub: _(completar)_): resumen (bucle, decisión y contadores). Mejora: _(completar)_
