@@ -141,7 +141,23 @@ def listar():
 
     return render_template("empleados.html", filas=filas, documentos=todos)
 
-
+# --------------------------------------------------------------
+# MARIANA SALAZAR (mejora): página de detalle de un empleado 
+# --------------------------------------------------------------
+@app.route("/empleados/<int:emp_id>") def detalle(emp_id):
+conexion = conectar()
+cursor = conexion.cursor(dictionary=True)
+cursor.execute("SELECT * FROM empleados WHERE id = %s", (emp_id,))
+emp = cursor.fetchone()
+if emp is None:
+cursor.close()
+conexion.close()
+return redirect("/empleados")
+cursor.execute("SELECT id, documento, estado FROM documentos WHERE empleado_id = %s ORDER BY id", (emp_id,))
+docs = cursor.fetchall()
+cursor.close()
+conexion.close()
+return render_template("detalle.html", emp=emp, docs=docs)
 # ---------------------------------------------------------------
 # FERNANDA POCASANGRE: modificar el estado de un documento (con validación)
 # ---------------------------------------------------------------
