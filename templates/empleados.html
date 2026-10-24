@@ -11,7 +11,7 @@
 </tr>
 {% for f in filas %}
 <tr>
-<td>{{ f.emp.nombre }}</td>
+<td><a href="/empleados/{{ f.emp.id }}">{{ f.emp.nombre }}</a></td>
 <td><span class="perfil {{ f.emp.perfil }}">{{ f.emp.perfil|capitalize }}</span></td>
 {% for c in f.celdas %}
 <td class="{{ c.estado|lower|replace(' ', '') }}">

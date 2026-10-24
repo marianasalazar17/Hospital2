@@ -1,0 +1,18 @@
+{% extends "base.html" %} 
+{% block titulo %}Detalle{% endblock %}
+{% block contenido %}
+<h1>{{ emp.nombre }}</h1>
+<p class="sub">Perfil: {{ emp.perfil|capitalize }} | Ingreso: {{ emp.fecha_ingreso
+}} | Correo: {{ emp.correo }}</p>
+<table>
+<tr><th>Documento</th><th>Estado</th></tr>
+{% for d in docs %}
+<tr>
+<td>{{ d.documento }}</td>
+<td class="{{ d.estado|lower }}"><a href="/documentos/editar/{{ d.id }}">{{
+d.estado }}</a></td>
+</tr>
+{% endfor %}
+</table>
+<p><a href="/empleados">Volver al listado</a></p>
+{% endblock %}
