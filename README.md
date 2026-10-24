@@ -51,7 +51,7 @@ Consulta con JOIN (listado): `SELECT ... FROM empleados e LEFT JOIN documentos d
 Lee todos los empleados y los recorre con `for`. Para cada uno consulta sus documentos y, con otro `for`, cuenta los pendientes. Luego decide con `if/elif/else`: sin documentos requeridos, completo (0 pendientes) o incompleto (1 o más). Tres contadores acumulan cuántos hay de cada clasificación y se muestran con colores distintos.
 
 ## Mejoras individuales (una rama y un pull request por integrante)
-- **Mariana Salazar** (GitHub: `marianasalazar17`): conexión a MySQL y estructura del repositorio. Mejora: _(completar)_
+- **Mariana Salazar** (GitHub: `marianasalazar17`): conexión a MySQL y estructura del repositorio. Mejora: página de detalle de cada empleado (/empleados/<id>) con sus datos y el estado de sus documentos.
 - **Fiorella Funes** (GitHub: _(completar)_): registro con validación y eliminación. Mejora: _(completar)_
 - **Fernanda Pocasangre** (GitHub: `fernandapocaa-tech`): consulta con JOIN y modificación con validación. Mejora: _(completar)_
 - **Alejandra Palma** (GitHub: _(completar)_): resumen (bucle, decisión y contadores). Mejora: _(completar)_
