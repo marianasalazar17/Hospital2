@@ -94,7 +94,8 @@ def eliminar(emp_id):
 # FERNANDA POCASANGRE: consultar con JOIN
 # ---------------------------------------------------------------
 @app.route("/empleados")
-def listar():    # MEJORA INDIVIDUAL: el texto escrito en el buscador (?q=...) filtra por nombre o perfil
+def listar():
+    # MEJORA INDIVIDUAL: el texto escrito en el buscador (?q=...) filtra por nombre o perfil
     q = request.args.get("q", "").strip()
     conexion = conectar()
     cursor = conexion.cursor(dictionary=True)
@@ -107,7 +108,7 @@ def listar():    # MEJORA INDIVIDUAL: el texto escrito en el buscador (?q=...) f
     # Consulta con JOIN: cada empleado junto con sus documentos
     consulta = ("SELECT e.id, e.nombre, e.perfil, d.id AS doc_id, d.documento, d.estado "
                 "FROM empleados e LEFT JOIN documentos d ON d.empleado_id = e.id ")
-        if q != "":
+         if q != "":
         consulta = consulta + "WHERE e.nombre LIKE %s OR e.perfil LIKE %s "
         cursor.execute(consulta + "ORDER BY e.id, d.id", ("%" + q + "%", "%" + q + "%"))
     else:
@@ -143,26 +144,26 @@ def listar():    # MEJORA INDIVIDUAL: el texto escrito en el buscador (?q=...) f
         else:
             expediente = "Incompleto"
         filas.append({"emp": info["emp"], "celdas": celdas, "expediente": expediente})
-
-    return render_template("empleados.html", filas=filas, documentos=todos)
+    return render_template("empleados.html", filas=filas, documentos=todos, q=q)
 
 # --------------------------------------------------------------
 # MARIANA SALAZAR (mejora): página de detalle de un empleado 
 # --------------------------------------------------------------
-@app.route("/empleados/<int:emp_id>") def detalle(emp_id):
-conexion = conectar()
-cursor = conexion.cursor(dictionary=True)
-cursor.execute("SELECT * FROM empleados WHERE id = %s", (emp_id,))
-emp = cursor.fetchone()
-if emp is None:
-cursor.close()
-conexion.close()
-return redirect("/empleados")
-cursor.execute("SELECT id, documento, estado FROM documentos WHERE empleado_id = %s ORDER BY id", (emp_id,))
-docs = cursor.fetchall()
-cursor.close()
-conexion.close()
-return render_template("detalle.html", emp=emp, docs=docs)
+@app.route("/empleados/<int:emp_id>")
+def detalle(emp_id):
+    conexion = conectar()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM empleados WHERE id = %s", (emp_id,))
+    emp = cursor.fetchone()
+    if emp is None:
+        cursor.close()
+        conexion.close()
+        return redirect("/empleados")
+    cursor.execute("SELECT id, documento, estado FROM documentos WHERE empleado_id = %s ORDER BY id", (emp_id,))
+    docs = cursor.fetchall()
+    cursor.close()
+    conexion.close()
+    return render_template("detalle.html", emp=emp, docs=docs)
 # ---------------------------------------------------------------
 # FERNANDA POCASANGRE: modificar el estado de un documento (con validación)
 # ---------------------------------------------------------------
