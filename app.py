@@ -1,4 +1,4 @@
-# app.py - Expedientes Digitales, Hospital de Diagnóstico (Desafío 2: MySQL)
+f# app.py - Expedientes Digitales, Hospital de Diagnóstico (Desafío 2: MySQL)
 import mysql.connector
 from datetime import datetime
 from flask import Flask, render_template, request, redirect
@@ -107,7 +107,11 @@ def listar():    # MEJORA INDIVIDUAL: el texto escrito en el buscador (?q=...) f
     # Consulta con JOIN: cada empleado junto con sus documentos
     consulta = ("SELECT e.id, e.nombre, e.perfil, d.id AS doc_id, d.documento, d.estado "
                 "FROM empleados e LEFT JOIN documentos d ON d.empleado_id = e.id ")
-    cursor.execute(consulta + "ORDER BY e.id, d.id")
+        if q != "":
+        consulta = consulta + "WHERE e.nombre LIKE %s OR e.perfil LIKE %s "
+        cursor.execute(consulta + "ORDER BY e.id, d.id", ("%" + q + "%", "%" + q + "%"))
+    else:
+        cursor.execute(consulta + "ORDER BY e.id, d.id")
     registros = cursor.fetchall()
     cursor.close()
     conexion.close()
