@@ -32,5 +32,5 @@
 </tr>
 {% endfor %}
 </table>
-<p>{% if q %}No se encontraron empleados con "{{ q }}".{% else %}No hay empleados registrados.{% endif %}</p>
+{% if filas|length == 0 %}<p>{% if q %}No se encontraron empleados con "{{ q }}".{% else %}No hay empleados registrados.{% endif %}</p>{% endif %}
 {% endblock %}
