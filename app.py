@@ -20,11 +20,14 @@ def obtener_perfiles(cursor):
         lista.append(fila["perfil"])
     return lista
 
+@app.errorhandler(mysql.connector.Error)
+def error_base_datos(error):
+    # Si MySQL está apagado, la página sigue viva y avisa en vez de romperse
+    return render_template("error_bd.html"), 503
 
 @app.route("/")
 def inicio():
     return redirect("/empleados")
-
 
 # ---------------------------------------------------------------
 # FIORELLA FUNES: registrar empleado (con validación) y eliminar
