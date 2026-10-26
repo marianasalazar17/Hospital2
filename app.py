@@ -249,12 +249,12 @@ def resumen():
                         "pendientes": pendientes, "total": total,
                         "clase": clase, "texto": texto})
 
- cursor.close()
- conexion.close()
- if len(empleados) > 0:
- porcentaje = round(completos / len(empleados) * 100)
- else:
- porcentaje = 0
- return render_template("resumen.html", detalle=detalle, completos=completos,
- incompletos=incompletos, sin_checklist=sin_checklist,
- total=len(empleados), porcentaje=porcentaje)
+    cursor.close()
+    conexion.close()
+    if len(empleados) > 0:
+        porcentaje = round(completos / len(empleados) * 100)
+    else:
+        porcentaje = 0
+    return render_template("resumen.html", detalle=detalle, completos=completos,
+                           incompletos=incompletos, sin_checklist=sin_checklist,
+                           total=len(empleados), porcentaje=porcentaje)
