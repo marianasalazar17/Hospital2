@@ -54,4 +54,5 @@ Lee todos los empleados y los recorre con `for`. Para cada uno consulta sus docu
 - **Mariana Salazar** (GitHub: `marianasalazar17`): conexión a MySQL y estructura del repositorio. Mejora: página de detalle de cada empleado (/empleados/<id>) con sus datos y el estado de sus documentos.
 - **Fiorella Funes** (GitHub: _(completar)_): registro con validación y eliminación. Mejora: _(completar)_
 - **Fernanda Pocasangre** (GitHub: `fernandapocaa-tech`): consulta con JOIN y modificación con validación. Mejora: búsqueda por texto en el listado (/empleados?q=...) con LIKE; filtra por nombre o perfil.
-- **Alejandra Palma** (GitHub: _(completar)_): resumen (bucle, decisión y contadores). Mejora: _(completar)_
+- **Alejandra Palma** (GitHub: alepal1): resumen (bucle, decisión y contadores). Mejora: porcentaje de expedientes completos con barra de progreso en el
+resumen."
