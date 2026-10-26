@@ -3,7 +3,9 @@
 {% block contenido %}
 <h1>Resumen de expedientes</h1>
 <p class="sub">Total de empleados: {{ total }}</p>
-<div class="tarjetas">
+<div class="tarjetas"> <p class="sub">Expedientes completos: {{ porcentaje }}%</p>
+<div class="barra"><div class="relleno" style="width: {{ porcentaje }}%"></div>
+</div>
 <div class="tarjeta completo"><span class="numero">{{ completos }}</span> Expedientes completos</div>
 <div class="tarjeta incompleto"><span class="numero">{{ incompletos }}</span> Expedientes incompletos</div>
 {% if sin_checklist > 0 %}
