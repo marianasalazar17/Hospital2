@@ -67,6 +67,9 @@ elif perfil not in perfiles:
             error = "La fecha debe tener el formato AAAA-MM-DD (ejemplo: 2024-05-20)."
         elif "@" not in correo or "." not in correo:
             error = "Escribe un correo válido (ejemplo: nombre@hospital.com)."
+        elif correo_repetido:
+            error = "Ya existe un empleado con ese correo."
+
         else:
             cursor.execute(
                 "INSERT INTO empleados (nombre, perfil, fecha_ingreso, correo) VALUES (%s, %s, %s, %s)",
