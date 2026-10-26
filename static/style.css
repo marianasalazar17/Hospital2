@@ -41,3 +41,6 @@ button.peligro { margin-top: 0; padding: 6px 12px; background: #c0392b; }
 .buscador input { padding: 8px; border: 1px solid #bbb; border-radius: 6px; width: 280px; }
 .buscador a { color: #1a5fb4; font-size: 14px; }
 
+/* Barra de porcentaje (mejora de Alejandra) */
+.barra { width: 100%; max-width: 500px; height: 18px; background: #e3e3e3; borderradius: 9px; overflow: hidden; margin-bottom: 16px; }
+.relleno { height: 100%; background: #2e8b57; }
