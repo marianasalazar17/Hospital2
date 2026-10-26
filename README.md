@@ -16,6 +16,7 @@ python app.py
 - http://127.0.0.1:5000/empleados
 - http://127.0.0.1:5000/empleados?q=ana  (búsqueda)
 - http://127.0.0.1:5000/empleados/nuevo
+- - http://127.0.0.1:5000/resumen
 
 La conexión usa `host=localhost, user=root, password=""` (valores por defecto de XAMPP).
 
@@ -33,6 +34,7 @@ static/           style.css (única hoja de estilos)
 | Ruta | Método | Qué hace |
 |---|---|---|
 | `/empleados` | GET | Lista empleados y documentos (consulta con JOIN). |
+| `/empleados/<id>` | GET | Página de detalle de un empleado |
 | `/empleados/nuevo` | GET, POST | Registro con validación |
 | `/empleados/eliminar/<id>` | POST | Elimina un empleado; sus documentos se borran solos (ON DELETE CASCADE) |
 | `/documentos/editar/<id>` | GET, POST | Modifica el estado de un documento con validación |
@@ -52,8 +54,6 @@ Lee todos los empleados y los recorre con `for`. Para cada uno consulta sus docu
 
 ## Mejoras individuales (una rama y un pull request por integrante)
 - **Mariana Salazar** (GitHub: `marianasalazar17`): conexión a MySQL y estructura del repositorio. Mejora: página de detalle de cada empleado (/empleados/<id>) con sus datos y el estado de sus documentos.
-- **Fiorella Funes** (GitHub:"Fiore463": registro con validación y eliminación. "Mejora:  validaciones extra al registrar: nombre de mínimo 3 letras y correo no
-repetido"
+- **Fiorella Funes** (GitHub: `Fiore463`): registro con validación y eliminación. Mejora: validaciones extra al registrar: nombre de mínimo 3 letras y correo no repetido.
 - **Fernanda Pocasangre** (GitHub: `fernandapocaa-tech`): consulta con JOIN y modificación con validación. Mejora: búsqueda por texto en el listado (/empleados?q=...) con LIKE; filtra por nombre o perfil.
-- **Alejandra Palma** (GitHub: alepal1): resumen (bucle, decisión y contadores). Mejora: porcentaje de expedientes completos con barra de progreso en el
-resumen."
+- **Alejandra Palma** (GitHub: `alepal1`): resumen (bucle, decisión y contadores). Mejora: porcentaje de expedientes completos con barra de progreso en el resumen.
