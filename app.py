@@ -53,8 +53,8 @@ def nuevo():
         except ValueError:
             fecha_valida = False
             
-cursor.execute("SELECT id FROM empleados WHERE correo = %s", (correo,))
- correo_repetido = cursor.fetchone() is not None
+    cursor.execute("SELECT id FROM empleados WHERE correo = %s", (correo,))
+    correo_repetido = cursor.fetchone() is not None
 
         if nombre == "":
             error = "El nombre no puede estar vacío."
@@ -69,7 +69,6 @@ elif perfil not in perfiles:
             error = "Escribe un correo válido (ejemplo: nombre@hospital.com)."
         elif correo_repetido:
             error = "Ya existe un empleado con ese correo."
-
         else:
             cursor.execute(
                 "INSERT INTO empleados (nombre, perfil, fecha_ingreso, correo) VALUES (%s, %s, %s, %s)",
