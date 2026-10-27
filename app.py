@@ -53,7 +53,7 @@ def nuevo():
         except ValueError:
             fecha_valida = False
             
-         cursor.execute("SELECT id FROM empleados WHERE correo = %s", (correo,))
+        cursor.execute("SELECT id FROM empleados WHERE correo = %s", (correo,))
         correo_repetido = cursor.fetchone() is not None
         if nombre == "":
             error = "El nombre no puede estar vacío."
