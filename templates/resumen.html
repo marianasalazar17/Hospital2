@@ -2,7 +2,8 @@
 {% block titulo %}Resumen{% endblock %}
 {% block contenido %}
 <h1>Resumen de expedientes</h1>
-<<p class="sub">Expedientes completos: {{ porcentaje }}%</p>
+<p class="sub">Total de empleados: {{ total }}</p>
+<p class="sub">Expedientes completos: {{ porcentaje }}%</p>
 <div class="barra"><div class="relleno" style="width: {{ porcentaje }}%"></div></div>
 <div class="tarjetas">
 <div class="tarjeta completo"><span class="numero">{{ completos }}</span> Expedientes completos</div>
