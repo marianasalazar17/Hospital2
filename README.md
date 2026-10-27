@@ -16,7 +16,7 @@ python app.py
 - http://127.0.0.1:5000/empleados
 - http://127.0.0.1:5000/empleados?q=ana  (búsqueda)
 - http://127.0.0.1:5000/empleados/nuevo
-- - http://127.0.0.1:5000/resumen
+- http://127.0.0.1:5000/resumen
 
 La conexión usa `host=localhost, user=root, password=""` (valores por defecto de XAMPP).
 
