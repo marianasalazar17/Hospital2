@@ -53,14 +53,15 @@ def nuevo():
         except ValueError:
             fecha_valida = False
             
-    cursor.execute("SELECT id FROM empleados WHERE correo = %s", (correo,))
+         cursor.execute("SELECT id FROM empleados WHERE correo = %s", (correo,))
         correo_repetido = cursor.fetchone() is not None
-         if nombre == "":
+        if nombre == "":
             error = "El nombre no puede estar vacío."
         elif len(nombre) < 3:
             error = "El nombre debe tener al menos 3 letras."
         elif perfil not in perfiles:
             error = "Elige un perfil de la lista."
+        elif not fecha_valida:
             error = "La fecha debe tener el formato AAAA-MM-DD (ejemplo: 2024-05-20)."
         elif "@" not in correo or "." not in correo:
             error = "Escribe un correo válido (ejemplo: nombre@hospital.com)."
