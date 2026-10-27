@@ -253,6 +253,10 @@ def resumen():
         porcentaje = round(completos / len(empleados) * 100)
     else:
         porcentaje = 0
-    return render_template("resumen.html", detalle=detalle, completos=completos,
+       return render_template("resumen.html", detalle=detalle, completos=completos,
                            incompletos=incompletos, sin_checklist=sin_checklist,
                            total=len(empleados), porcentaje=porcentaje)
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
