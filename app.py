@@ -1,9 +1,39 @@
 # app.py - Expedientes Digitales, Hospital de Diagnóstico (Desafío 2: MySQL)
-import mysql.connector
-from datetime import datetime
-from flask import Flask, render_template, request, redirect
+import io import mysql.connector from datetime import datetime, date from flask import Flask, render_template, request, redirect, send_file, abort
 
 app = Flask(__name__)
+
+# ---- Configuración de archivos (Tarea 3) ---- 
+EXTENSIONES_PERMITIDAS = (".pdf", ".doc", ".docx") 
+# El documento "Título" también acepta imágenes y se abre en una página con la imagen 
+EXTENSIONES_IMAGEN = (".png", ".jpg", ".jpeg")
+DOCUMENTOS_CON_IMAGEN = ("Título",) 
+# 500 KB: queda por debajo del max_allowed_packet de 1M que trae XAMPP. 
+# Si suben max_allowed_packet a 16M en my.ini, pueden cambiarlo a 5 * 1024 * 1024. 
+TAMANO_MAXIMO = 500 * 1024
+
+# Documentos que exigen fecha de vencimiento (confirmar con la ficha del Socio Formador) 
+DOCUMENTOS_CON_VENCIMIENTO = ("DUI",)
+
+def extension_valida(nombre, documento=""): 
+    # .lower() para que .PDF y .pdf cuenten igual 
+    permitidas = EXTENSIONES_PERMITIDAS
+    if documento in DOCUMENTOS_CON_IMAGEN: 
+        # El Título acepta también .png y .jpg 
+        permitidas = EXTENSIONES_PERMITIDAS + EXTENSIONES_IMAGEN 
+        return nombre.lower().endswith(permitidas)
+
+    def es_imagen(nombre): 
+        return nombre.lower().endswith(EXTENSIONES_IMAGEN)
+
+def estado_version(version, ultima, vencimiento):
+    # Decide el estado de una versión de un archivo
+    if version != ultima: 
+        return "Versión anterior"
+    elif vencimiento is not None and vencimiento < date.today(): 
+        return "Vencido" 
+    else: 
+        return "Vigente"
 
 
 # ---------------------------------------------------------------
@@ -20,10 +50,13 @@ def obtener_perfiles(cursor):
         lista.append(fila["perfil"])
     return lista
 
-
-@app.route("/")
+@app.route("/") 
 def inicio():
-    return redirect("/empleados")
+    # La página principal ahora es el dashboard (la función resumen)
+    return resumen()
+
+
+
 
 
 # ---------------------------------------------------------------
