@@ -80,3 +80,16 @@ INSERT INTO documentos (empleado_id, documento, estado) VALUES
 (5, 'Solvencia PNP', 'Completo'),
 (5, 'Colegiatura médica', 'Completo'),
 (5, 'Especialidad', 'Completo');
+ -- Tarea 3: archivos subidos (PDF, Word o imagen del Título), con versiones 
+CREATE TABLE archivos ( 
+id INT AUTO_INCREMENT PRIMARY KEY, 
+documento_id INT NOT NULL, 
+tipo_documento VARCHAR(100) NOT NULL, 
+nombre_original VARCHAR(255) NOT NULL, 
+version INT NOT NULL, 
+fecha_vencimiento DATE NULL, 
+contenido LONGBLOB NOT NULL, 
+fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+UNIQUE (documento_id, version),
+FOREIGN KEY (documento_id) REFERENCES documentos(id) ON DELETE CASCADE 
+) ENGINE=InnoDB;
