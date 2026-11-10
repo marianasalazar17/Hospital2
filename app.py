@@ -300,7 +300,7 @@ def listar():
         else:
             expediente = "Incompleto"
         filas.append({"emp": info["emp"], "celdas": celdas, "expediente": expediente})
-    return render_template("empleados.html", filas=filas, documentos=todos, q=q)
+        return render_template("empleados.html", filas=filas, documentos=todos, q=q, perfil=perfil)
 
 # --------------------------------------------------------------
 # MARIANA SALAZAR (mejora): página de detalle de un empleado 
