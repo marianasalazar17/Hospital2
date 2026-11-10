@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block titulo %}Documentos{% endblock %}
+{% block contenido %}
+<h1>Documentos del personal</h1>
+<p class="sub">{{ total }} documentos en total · {{ sin_archivo }} todavía sin archivo subido</p>
+<table>
+<tr><th>Empleado</th><th>Documento</th><th>Estado</th><th>Versiones</th><th>Acciones</th></tr>
+{% for f in filas %}
+<tr>
+<td><a href="/empleados/{{ f.emp_id }}">{{ f.nombre }}</a></td>
+<td>{{ f.documento }}</td>
+<td class="{{ f.estado|lower }}"><a href="/documentos/editar/{{ f.id }}">{{ f.estado }}</a></td>
+<td>{{ f.versiones }}</td>
+<td>
+{% if f.imagen %}<a href="/documentos/{{ f.id }}/imagen">Ver imagen</a>{% else %}<a href="/documentos/{{ f.id }}/versiones">Ver versiones</a>{% endif %}
+ | <a href="/documentos/{{ f.id }}/subir">Subir</a>
+</td>
+</tr>
+{% else %}
+<tr><td colspan="5">Todavía no hay documentos.</td></tr>
+{% endfor %}
+</table>
+<div class="acciones"><a class="boton gris" href="/">Volver al dashboard</a></div>
+{% endblock %}
