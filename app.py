@@ -378,7 +378,40 @@ def ver_archivo(archivo_id):
         tipo = "image/png"
     else:
         tipo = "image/jpeg"
-    return
+    return send_file(io.BytesIO(fila["contenido"]), mimetype=tipo)
+
+
+@app.route("/documentos/<int:doc_id>/imagen")
+def imagen(doc_id):
+    conexion = conectar()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute(
+        "SELECT d.id, d.documento, e.nombre FROM documentos d "
+        "JOIN empleados e ON e.id = d.empleado_id WHERE d.id = %s", (doc_id,))
+    doc = cursor.fetchone()
+    if doc is None:
+        cursor.close()
+        conexion.close()
+        abort(404)
+    if doc["documento"] not in DOCUMENTOS_CON_IMAGEN:
+        # Solo el Título tiene página de imagen; los demás documentos van a sus versiones
+        cursor.close()
+        conexion.close()
+        return redirect("/documentos/" + str(doc_id) + "/versiones")
+
+    cursor.execute(
+        "SELECT id, nombre_original, version, fecha_subida FROM archivos "
+        "WHERE documento_id = %s ORDER BY version DESC", (doc_id,))
+    archivos = cursor.fetchall()
+    cursor.close()
+    conexion.close()
+
+    # De todos los archivos del Título, solo las imágenes (la más nueva queda primero)
+    imagenes = []
+    for a in archivos:
+        if es_imagen(a["nombre_original"]):
+            imagenes.append(a)
+    return render_template("imagen.html", doc=doc, imagenes=imagenes)
 
 
 # ---------------------------------------------------------------
