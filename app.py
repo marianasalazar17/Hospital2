@@ -1,5 +1,8 @@
 # app.py - Expedientes Digitales, Hospital de Diagnóstico (Desafío 2: MySQL)
-import io import mysql.connector from datetime import datetime, date from flask import Flask, render_template, request, redirect, send_file, abort
+import io
+import mysql.connector
+from datetime import datetime, date 
+from flask import Flask, render_template, request, redirect, send_file, abort
 
 app = Flask(__name__)
 
