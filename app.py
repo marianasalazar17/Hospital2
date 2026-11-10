@@ -280,6 +280,9 @@ def listar():
     filas = []
     for emp_id in empleados:
         info = empleados[emp_id]
+                # Si se pidió un perfil, se saltan los empleados de otros perfiles
+        if perfil != "" and info["emp"]["perfil"] != perfil:
+            continue
         celdas = []
         pendientes = 0
         for nombre_doc in todos:
