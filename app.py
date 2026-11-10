@@ -56,9 +56,9 @@ def error_base_datos(error):
     # Si MySQL está apagado, la página sigue viva y avisa en vez de romperse
     return render_template("error_bd.html"), 503
 
-@app.route("/")
-def inicio():
-    return redirect("/empleados")
+@app.route("/") 
+def inicio(): 
+    # La página principal ahora es el dashboard (la función resumen) return resumen()
 
 # ---------------------------------------------------------------
 # FIORELLA FUNES: registrar empleado (con validación) y eliminar
