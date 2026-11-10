@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block titulo %}Empleados{% endblock %}
+{% block contenido %}
+<h1>Empleados</h1>
+<p class="sub">Expediente de cada empleado y estado de sus documentos.</p>
+<form method="GET" action="/empleados" class="buscador">
+<input type="text" name="q" value="{{ q }}" placeholder="Buscar por nombre, perfil o archivo">
+<button type="submit">Buscar</button>
+{% if q %}<a href="/empleados">Quitar filtro</a>{% endif %}
+</form>
+<table>
+<tr>
+<th>Empleado</th><th>Perfil</th>
+{% for d in documentos %}<th>{{ d }}</th>{% endfor %}
+<th>Expediente</th><th>Acciones</th>
+</tr>
+{% for f in filas %}
+<tr>
+<td><a href="/empleados/{{ f.emp.id }}">{{ f.emp.nombre }}</a></td>
+<td><span class="perfil {{ f.emp.perfil }}">{{ f.emp.perfil|capitalize }}</span></td>
+{% for c in f.celdas %}
+<td class="{{ c.estado|lower|replace(' ', '') }}">
+{% if c.id %}
+<a href="/documentos/editar/{{ c.id }}">{{ c.estado }}</a><br>
+{% if c.imagen %}<a class="mini" href="/documentos/{{ c.id }}/imagen">Ver imagen</a>{% else %}<a class="mini" href="/documentos/{{ c.id }}/versiones">Archivos</a>{% endif %}
+{% else %}{{ c.estado }}{% endif %}
+</td>
+{% endfor %}
+<td class="{{ f.expediente|lower }}">{{ f.expediente }}</td>
+<td>
+<form method="POST" action="/empleados/eliminar/{{ f.emp.id }}" onsubmit="return confirm('¿Eliminar a {{ f.emp.nombre|e }}?');">
+<button type="submit" class="peligro">Eliminar</button>
+</form>
+</td>
+</tr>
+{% endfor %}
+</table>
+{% if filas|length == 0 %}<p>{% if q %}No se encontraron empleados con "{{ q }}".{% else %}No hay empleados registrados.{% endif %}</p>{% endif %}
+<div class="acciones"><a class="boton gris" href="/">Volver al dashboard</a></div>
+{% endblock %}
