@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block titulo %}Versiones{% endblock %}
+{% block contenido %}
+<h1>Versiones de {{ doc["documento"] }}</h1>
+<p class="sub">Empleado: {{ doc["nombre"] }}</p>
+<div class="acciones">
+<a class="boton" href="/documentos/{{ doc['id'] }}/subir">Subir nueva versión</a>
+<a class="boton gris" href="/empleados">Volver al listado</a>
+</div>
+<table>
+<tr><th>Versión</th><th>Archivo</th><th>Subido</th><th>Vence</th><th>Estado</th><th>Descargar</th></tr>
+{% for f in archivos %}
+<tr class="{{ f.clase }}">
+<td>{{ f.datos["version"] }}</td>
+<td>{{ f.datos["nombre_original"] }}</td>
+<td>{{ f.datos["fecha_subida"] }}</td>
+<td>{{ f.datos["fecha_vencimiento"] or "-" }}</td>
+<td><span class="badge {{ f.clase }}">{{ f.estado }}</span></td>
+<td><a href="/archivos/descargar/{{ f.datos['id'] }}">Descargar</a></td>
+</tr>
+{% else %}
+<tr><td colspan="6">Todavía no hay archivos subidos para este documento.</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

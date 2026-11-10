@@ -251,6 +251,10 @@ def listar():
     consulta = ("SELECT e.id, e.nombre, e.perfil, d.id AS doc_id, d.documento, d.estado "
                 "FROM empleados e LEFT JOIN documentos d ON d.empleado_id = e.id ")
     if q != "":
+                # Ahora también busca por nombre de archivo subido
+
+        patron = "%" + q + "%"
+        cursor.execute(consulta + "ORDER BY e.id, d.id", (patron, patron, patron))
         consulta = consulta + "WHERE e.nombre LIKE %s OR e.perfil LIKE %s "
         cursor.execute(consulta + "ORDER BY e.id, d.id", ("%" + q + "%", "%" + q + "%"))
     else:
@@ -277,7 +281,8 @@ def listar():
                 d = info["docs"][nombre_doc]
                 if d["estado"] == "Pendiente":
                     pendientes = pendientes + 1
-                celdas.append({"estado": d["estado"], "id": d["doc_id"]})
+                celdas.append({"estado": d["estado"], "id": d["doc_id"],
+                               "imagen": nombre_doc in DOCUMENTOS_CON_IMAGEN})
             else:
                 celdas.append({"estado": "No aplica", "id": None})
 
@@ -363,6 +368,112 @@ def editar(doc_id):
     cursor.close()
     conexion.close()
     return render_template("editar.html", doc=doc, error=error)
+
+
+# ---------------------------------------------------------------
+# FERNANDA POCASANGRE: listado de versiones (con estado), descarga e imagen del Título
+# ---------------------------------------------------------------
+@app.route("/documentos/<int:doc_id>/versiones")
+def versiones(doc_id):
+    conexion = conectar()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute(
+        "SELECT d.id, d.documento, e.nombre FROM documentos d "
+        "JOIN empleados e ON e.id = d.empleado_id WHERE d.id = %s", (doc_id,))
+    doc = cursor.fetchone()
+    if doc is None:
+        cursor.close()
+        conexion.close()
+        abort(404)
+
+    # Solo las columnas que se muestran: NUNCA se trae el contenido (LONGBLOB) en un listado
+    cursor.execute(
+        "SELECT id, nombre_original, version, fecha_vencimiento, fecha_subida "
+        "FROM archivos WHERE documento_id = %s ORDER BY version DESC", (doc_id,))
+    archivos = cursor.fetchall()
+    cursor.close()
+    conexion.close()
+
+    ultima = 0
+    if len(archivos) > 0:
+        ultima = archivos[0]["version"]
+
+    lista = []
+    for a in archivos:
+        estado = estado_version(a["version"], ultima, a["fecha_vencimiento"])
+        if estado == "Vigente":
+            clase = "completo"
+        elif estado == "Vencido":
+            clase = "incompleto"
+        else:
+            clase = "anterior"
+        lista.append({"datos": a, "estado": estado, "clase": clase})
+    return render_template("versiones.html", doc=doc, archivos=lista)
+
+
+@app.route("/archivos/descargar/<int:archivo_id>")
+def descargar(archivo_id):
+    conexion = conectar()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT nombre_original, contenido FROM archivos WHERE id = %s", (archivo_id,))
+    fila = cursor.fetchone()
+    cursor.close()
+    conexion.close()
+    if fila is None:
+        abort(404)
+    return send_file(io.BytesIO(fila["contenido"]), as_attachment=True,
+                     download_name=fila["nombre_original"])
+
+
+@app.route("/archivos/ver/<int:archivo_id>")
+def ver_archivo(archivo_id):
+    # Muestra una imagen guardada en MySQL directamente en la página (no la descarga)
+    conexion = conectar()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT nombre_original, contenido FROM archivos WHERE id = %s", (archivo_id,))
+    fila = cursor.fetchone()
+    cursor.close()
+    conexion.close()
+    if fila is None or not es_imagen(fila["nombre_original"]):
+        abort(404)
+    if fila["nombre_original"].lower().endswith(".png"):
+        tipo = "image/png"
+    else:
+        tipo = "image/jpeg"
+    return send_file(io.BytesIO(fila["contenido"]), mimetype=tipo)
+
+
+@app.route("/documentos/<int:doc_id>/imagen")
+def imagen(doc_id):
+    conexion = conectar()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute(
+        "SELECT d.id, d.documento, e.nombre FROM documentos d "
+        "JOIN empleados e ON e.id = d.empleado_id WHERE d.id = %s", (doc_id,))
+    doc = cursor.fetchone()
+    if doc is None:
+        cursor.close()
+        conexion.close()
+        abort(404)
+    if doc["documento"] not in DOCUMENTOS_CON_IMAGEN:
+        # Solo el Título tiene página de imagen; los demás documentos van a sus versiones
+        cursor.close()
+        conexion.close()
+        return redirect("/documentos/" + str(doc_id) + "/versiones")
+
+    cursor.execute(
+        "SELECT id, nombre_original, version, fecha_subida FROM archivos "
+        "WHERE documento_id = %s ORDER BY version DESC", (doc_id,))
+    archivos = cursor.fetchall()
+    cursor.close()
+    conexion.close()
+
+    # De todos los archivos del Título, solo las imágenes (la más nueva queda primero)
+    imagenes = []
+    for a in archivos:
+        if es_imagen(a["nombre_original"]):
+            imagenes.append(a)
+    return render_template("imagen.html", doc=doc, imagenes=imagenes)
 
 
 # ---------------------------------------------------------------
