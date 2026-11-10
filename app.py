@@ -244,7 +244,11 @@ def listar():
     conexion = conectar()
     cursor = conexion.cursor(dictionary=True)
 
-    cursor.execute("SELECT documento FROM checklist GROUP BY documento ORDER BY MIN(id)")
+    # Si hay perfil, solo salen las columnas de los documentos que ese perfil exige
+    if perfil != "":
+        cursor.execute("SELECT documento FROM checklist WHERE perfil = %s ORDER BY id", (perfil,))
+    else:
+        cursor.execute("SELECT documento FROM checklist GROUP BY documento ORDER BY MIN(id)")
     todos = []
     for fila in cursor.fetchall():
         todos.append(fila["documento"])
