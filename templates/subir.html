@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block titulo %}Subir archivo{% endblock %}
+{% block contenido %}
+<h1>Subir archivo</h1>
+<p>Empleado: <strong>{{ doc.nombre }}</strong><br>
+Documento: <strong>{{ doc.documento }}</strong><br>
+Estado actual: <strong>{{ doc.estado }}</strong></p>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+<!-- enctype="multipart/form-data" es obligatorio: sin él el archivo nunca llega al servidor -->
+<form method="POST" action="/documentos/{{ doc.id }}/subir" enctype="multipart/form-data">
+<label>Archivo</label>
+{% if con_imagen %}
+<input type="file" name="archivo" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
+<p>Permitidos: .pdf, .doc, .docx, .png o .jpg. Tamaño máximo: {{ tamano_kb }} KB.</p>
+{% else %}
+<input type="file" name="archivo" accept=".pdf,.doc,.docx">
+<p>Permitidos: .pdf, .doc o .docx. Tamaño máximo: {{ tamano_kb }} KB.</p>
+{% endif %}
+<label>Fecha de vencimiento (AAAA-MM-DD){% if requiere_fecha %} — obligatoria{% else %} — opcional{% endif %}</label>
+<input type="text" name="fecha_vencimiento" placeholder="2030-05-20">
+<button type="submit">Subir</button>
+</form>
+<p>Cada subida se guarda como una versión nueva; las anteriores se conservan.</p>
+{% endblock %}

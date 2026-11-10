@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block titulo %}No se puede eliminar{% endblock %}
+{% block contenido %}
+<h1>No se puede eliminar</h1>
+<p class="error">No se puede eliminar a <strong>{{ emp.nombre }}</strong>: tiene
+{{ con_avance }} documento{% if con_avance != 1 %}s{% endif %} con avance
+(en un estado distinto de Pendiente o con archivos subidos).</p>
+<p>Solo se puede eliminar a un empleado vacío: todos sus documentos en Pendiente y sin archivos.</p>
+<p><a href="/empleados">Volver a la lista de empleados</a></p>
+{% endblock %}
