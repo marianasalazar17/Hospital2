@@ -90,7 +90,30 @@ def nuevo():
 @app.route("/empleados/eliminar/<int:emp_id>", methods=["POST"])
 def eliminar(emp_id):
     conexion = conectar()
-    cursor = conexion.cursor()
+    cursor = conexion.cursor(dictionary=True)
+
+    # Regla nueva: solo se elimina un empleado "vacío":
+    # todos sus documentos en Pendiente y sin ningún archivo subido
+    cursor.execute("SELECT nombre FROM empleados WHERE id = %s", (emp_id,))
+    emp = cursor.fetchone()
+    if emp is None:
+        cursor.close()
+        conexion.close()
+        return redirect("/empleados")
+    cursor.execute(
+        "SELECT d.estado, COUNT(a.id) AS archivos FROM documentos d "
+        "LEFT JOIN archivos a ON a.documento_id = d.id "
+        "WHERE d.empleado_id = %s GROUP BY d.id, d.estado", (emp_id,))
+    docs = cursor.fetchall()
+    con_avance = 0
+    for d in docs:
+        if d["estado"] != "Pendiente" or d["archivos"] > 0:
+            con_avance = con_avance + 1
+    if con_avance > 0:
+        cursor.close()
+        conexion.close()
+        return render_template("no_eliminar.html", emp=emp, con_avance=con_avance), 409
+
     # ON DELETE CASCADE borra solo los documentos del empleado (no quedan huérfanos)
     cursor.execute("DELETE FROM empleados WHERE id = %s", (emp_id,))
     conexion.commit()
