@@ -301,11 +301,37 @@ def detalle(emp_id):
         cursor.close()
         conexion.close()
         return redirect("/empleados")
-    cursor.execute("SELECT id, documento, estado FROM documentos WHERE empleado_id = %s ORDER BY id", (emp_id,))
-    docs = cursor.fetchall()
-    cursor.close()
-    conexion.close()
-    return render_template("detalle.html", emp=emp, docs=docs)
+    # Cada documento con cuántas versiones tiene (sin traer el LONGBLOB) 
+    cursor.execute( 
+        "SELECT d.id, d.documento, d.estado, COUNT(a.id) AS versiones, MAX(a.version) AS ultima " 
+        "FROM documentos d LEFT JOIN archivos a ON a.documento_id = d.id " 
+    "WHERE d.empleado_id = %s GROUP BY d.id, d.documento, d.estado ORDER BY d.id", (emp_id,))
+  docs = cursor.fetchall() 
+cursor.close() 
+conexion.close() 
+# El documento "Título" se abre en la página de imagen; los demás, en la de versiones 
+for d in docs: 
+    d["imagen"] = d["documento"] in DOCUMENTOS_CON_IMAGEN 
+    return render_template("detalle.html", emp=emp, docs=docs) 
+    
+# --------------------------------------------------------------
+# MARIANA SALAZAR: tabla del checklist (qué documentos exige cada perfil) 
+# --------------------------------------------------------------
+@app.route("/checklist") 
+def ver_checklist(): 
+    conexion = conectar() 
+    cursor = conexion.cursor(dictionary=True) 
+    cursor.execute("SELECT perfil, documento FROM checklist ORDER BY id") 
+    filas = cursor.fetchall() 
+    cursor.close() 
+    conexion.close() 
+    
+# Se agrupan los documentos por perfil 
+perfiles = {} 
+for f in filas: 
+if f["perfil"] not in perfiles: 
+    perfiles[f["perfil"]] = [] perfiles[f["perfil"]].append(f["documento"]) 
+return render_template("checklist.html", perfiles=perfiles)
 # ---------------------------------------------------------------
 # FERNANDA POCASANGRE: modificar el estado de un documento (con validación)
 # ---------------------------------------------------------------
