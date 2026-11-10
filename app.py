@@ -220,6 +220,10 @@ def listar():
     consulta = ("SELECT e.id, e.nombre, e.perfil, d.id AS doc_id, d.documento, d.estado "
                 "FROM empleados e LEFT JOIN documentos d ON d.empleado_id = e.id ")
     if q != "":
+                # Ahora también busca por nombre de archivo subido
+
+        patron = "%" + q + "%"
+        cursor.execute(consulta + "ORDER BY e.id, d.id", (patron, patron, patron))
         consulta = consulta + "WHERE e.nombre LIKE %s OR e.perfil LIKE %s "
         cursor.execute(consulta + "ORDER BY e.id, d.id", ("%" + q + "%", "%" + q + "%"))
     else:
@@ -246,7 +250,8 @@ def listar():
                 d = info["docs"][nombre_doc]
                 if d["estado"] == "Pendiente":
                     pendientes = pendientes + 1
-                celdas.append({"estado": d["estado"], "id": d["doc_id"]})
+                celdas.append({"estado": d["estado"], "id": d["doc_id"],
+                               "imagen": nombre_doc in DOCUMENTOS_CON_IMAGEN})
             else:
                 celdas.append({"estado": "No aplica", "id": None})
 
