@@ -35,6 +35,18 @@
 <a class="portal" href="/checklist"><span class="icono">✅</span><strong>Checklist por perfil</strong><span class="txt">Qué documentos exige cada perfil</span></a>
 </div>
 
+<h2 class="seccion">Empleados por perfil</h2>
+<div class="portales">
+<a class="portal" href="/empleados?perfil=administrativo"><span class="icono">🗂️</span><strong>Administrativo</strong><span class="txt">Solo el personal administrativo</span></a>
+<a class="portal" href="/empleados?perfil=medico"><span class="icono">🩺</span><strong>Médico</strong><span class="txt">Solo los médicos</span></a>
+<a class="portal" href="/empleados?perfil=enfermeria"><span class="icono">💉</span><strong>Enfermería</strong><span class="txt">Solo el personal de enfermería</span></a>
+</div>
+
+<h2 class="seccion">Documentos por tipo</h2>
+<nav class="pestanas">
+{% for t in ["DUI", "Título", "Antecedentes Penal", "Solvencia PNP", "Colegiatura médica", "Especialidad", "Junta de Vigilancia"] %}<a href="/documentos?tipo={{ t|urlencode }}">{{ t }}</a>{% endfor %}
+</nav>
+
 <h2 class="seccion">Detalle por empleado</h2>
 <table>
 <tr><th>Empleado</th><th>Perfil</th><th>Vigentes</th><th>Vencidos</th><th>Sin archivo</th><th>Requeridos</th><th>Clasificación</th></tr>
