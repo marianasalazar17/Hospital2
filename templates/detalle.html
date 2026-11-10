@@ -1,18 +1,21 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
 {% block titulo %}Detalle{% endblock %}
 {% block contenido %}
 <h1>{{ emp.nombre }}</h1>
-<p class="sub">Perfil: {{ emp.perfil|capitalize }} | Ingreso: {{ emp.fecha_ingreso
-}} | Correo: {{ emp.correo }}</p>
+<p class="sub">Perfil: {{ emp.perfil|capitalize }} | Ingreso: {{ emp.fecha_ingreso }} | Correo: {{ emp.correo }}</p>
 <table>
-<tr><th>Documento</th><th>Estado</th></tr>
+<tr><th>Documento</th><th>Estado</th><th>Versiones</th><th>Archivos</th></tr>
 {% for d in docs %}
 <tr>
 <td>{{ d.documento }}</td>
-<td class="{{ d.estado|lower }}"><a href="/documentos/editar/{{ d.id }}">{{
-d.estado }}</a></td>
+<td class="{{ d.estado|lower }}"><a href="/documentos/editar/{{ d.id }}">{{ d.estado }}</a></td>
+<td>{{ d.versiones }}</td>
+<td>
+{% if d.imagen %}<a href="/documentos/{{ d.id }}/imagen">Ver imagen</a>{% else %}<a href="/documentos/{{ d.id }}/versiones">Ver versiones</a>{% endif %}
+ | <a href="/documentos/{{ d.id }}/subir">Subir</a>
+</td>
 </tr>
 {% endfor %}
 </table>
-<p><a href="/empleados">Volver al listado</a></p>
+<div class="acciones"><a class="boton gris" href="/empleados">Volver al listado</a></div>
 {% endblock %}
