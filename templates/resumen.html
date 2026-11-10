@@ -1,26 +1,55 @@
 {% extends "base.html" %}
-{% block titulo %}Resumen{% endblock %}
+{% block titulo %}Dashboard{% endblock %}
 {% block contenido %}
-<h1>Resumen de expedientes</h1>
-<p class="sub">Total de empleados: {{ total }}</p>
-<p class="sub">Expedientes completos: {{ porcentaje }}%</p>
+<section class="hero">
+<div>
+<p class="hero-etiqueta">Recursos Humanos</p>
+<h1>Expedientes digitales del personal</h1>
+<p>Excelencia en medicina empieza por un equipo con su documentación al día.</p>
+<p class="hero-botones"><a class="boton claro" href="/empleados/nuevo">Registrar empleado</a> <a class="boton" href="/empleados">Ver empleados</a></p>
+</div>
+</section>
+
+<h2 class="seccion">Estado de los expedientes</h2>
+<p class="sub">Total de empleados: <strong>{{ total }}</strong> · Expedientes completos: <strong>{{ porcentaje }}%</strong></p>
 <div class="barra"><div class="relleno" style="width: {{ porcentaje }}%"></div></div>
 <div class="tarjetas">
-<div class="tarjeta completo"><span class="numero">{{ completos }}</span> Expedientes completos</div>
-<div class="tarjeta incompleto"><span class="numero">{{ incompletos }}</span> Expedientes incompletos</div>
+<div class="tarjeta completo"><span class="numero">{{ completos }}</span>Expedientes completos</div>
+<div class="tarjeta incompleto"><span class="numero">{{ incompletos }}</span>Expedientes incompletos</div>
 {% if sin_checklist > 0 %}
-<div class="tarjeta sinchecklist"><span class="numero">{{ sin_checklist }}</span> Sin documentos requeridos</div>
+<div class="tarjeta sinchecklist"><span class="numero">{{ sin_checklist }}</span>Sin documentos requeridos</div>
 {% endif %}
 </div>
+
+<h2 class="seccion">Documentos</h2>
+<div class="tarjetas">
+<div class="tarjeta completo"><span class="numero">{{ docs_vigentes }}</span>Documentos vigentes</div>
+<div class="tarjeta incompleto"><span class="numero">{{ docs_vencidos }}</span>Documentos vencidos</div>
+<div class="tarjeta sinchecklist"><span class="numero">{{ docs_sin_archivo }}</span>Documentos sin archivo</div>
+</div>
+
+<h2 class="seccion">Tablas</h2>
+<div class="portales">
+<a class="portal" href="/empleados"><span class="icono">👥</span><strong>Empleados</strong><span class="txt">Cada empleado con el estado de sus documentos</span></a>
+<a class="portal" href="/documentos"><span class="icono">📄</span><strong>Documentos</strong><span class="txt">Todos los documentos, sus versiones y archivos</span></a>
+<a class="portal" href="/checklist"><span class="icono">✅</span><strong>Checklist por perfil</strong><span class="txt">Qué documentos exige cada perfil</span></a>
+</div>
+
+<h2 class="seccion">Detalle por empleado</h2>
 <table>
-<tr><th>Empleado</th><th>Perfil</th><th>Documentos pendientes</th><th>Clasificación</th></tr>
+<tr><th>Empleado</th><th>Perfil</th><th>Vigentes</th><th>Vencidos</th><th>Sin archivo</th><th>Requeridos</th><th>Clasificación</th></tr>
 {% for d in detalle %}
 <tr>
 <td>{{ d.nombre }}</td>
-<td>{{ d.perfil|capitalize }}</td>
-<td>{{ d.pendientes }} de {{ d.total }}</td>
-<td class="{{ d.clase }}">{{ d.texto }}</td>
+<td><span class="perfil {{ d.perfil }}">{{ d.perfil|capitalize }}</span></td>
+<td>{{ d.vigentes }}</td>
+<td>{{ d.vencidos }}</td>
+<td>{{ d.sin_archivo }}</td>
+<td>{{ d.total }}</td>
+<td><span class="badge {{ d.clase }}">{{ d.texto }}</span></td>
 </tr>
+{% else %}
+<tr><td colspan="7">No hay empleados registrados.</td></tr>
 {% endfor %}
 </table>
 {% endblock %}
