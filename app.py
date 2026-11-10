@@ -251,12 +251,12 @@ def listar():
     consulta = ("SELECT e.id, e.nombre, e.perfil, d.id AS doc_id, d.documento, d.estado "
                 "FROM empleados e LEFT JOIN documentos d ON d.empleado_id = e.id ")
     if q != "":
-                # Ahora también busca por nombre de archivo subido
-
+        # Ahora también busca por nombre de archivo subido
+        consulta = consulta + ("WHERE e.nombre LIKE %s OR e.perfil LIKE %s OR EXISTS "
+                               "(SELECT 1 FROM archivos a JOIN documentos d2 ON d2.id = a.documento_id "
+                               "WHERE d2.empleado_id = e.id AND a.nombre_original LIKE %s) ")
         patron = "%" + q + "%"
         cursor.execute(consulta + "ORDER BY e.id, d.id", (patron, patron, patron))
-        consulta = consulta + "WHERE e.nombre LIKE %s OR e.perfil LIKE %s "
-        cursor.execute(consulta + "ORDER BY e.id, d.id", ("%" + q + "%", "%" + q + "%"))
     else:
         cursor.execute(consulta + "ORDER BY e.id, d.id")
     registros = cursor.fetchall()
