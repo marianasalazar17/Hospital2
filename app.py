@@ -298,6 +298,7 @@ def listar():
             expediente = "Incompleto"
         filas.append({"emp": info["emp"], "celdas": celdas, "expediente": expediente})
     return render_template("empleados.html", filas=filas, documentos=todos, q=q)
+
 # MARIANA SALAZAR (mejora): página de detalle de un empleado 
 # --------------------------------------------------------------
 @app.route("/empleados/<int:emp_id>")
@@ -344,26 +345,6 @@ def ver_checklist():
         perfiles[f["perfil"]].append(f["documento"])
     return render_template("checklist.html", perfiles=perfiles)
 
-
-    
-# --------------------------------------------------------------
-# MARIANA SALAZAR: tabla del checklist (qué documentos exige cada perfil) 
-# --------------------------------------------------------------
-@app.route("/checklist") 
-def ver_checklist(): 
-    conexion = conectar() 
-    cursor = conexion.cursor(dictionary=True) 
-    cursor.execute("SELECT perfil, documento FROM checklist ORDER BY id") 
-    filas = cursor.fetchall() 
-    cursor.close() 
-    conexion.close() 
-    
-# Se agrupan los documentos por perfil 
-perfiles = {} 
-for f in filas: 
-if f["perfil"] not in perfiles: 
-    perfiles[f["perfil"]] = [] perfiles[f["perfil"]].append(f["documento"]) 
-return render_template("checklist.html", perfiles=perfiles)
 # ---------------------------------------------------------------
 # FERNANDA POCASANGRE: modificar el estado de un documento (con validación)
 # ---------------------------------------------------------------
