@@ -309,6 +309,79 @@ def editar(doc_id):
 
 
 # ---------------------------------------------------------------
+# FERNANDA POCASANGRE: listado de versiones (con estado), descarga e imagen del Título
+# ---------------------------------------------------------------
+@app.route("/documentos/<int:doc_id>/versiones")
+def versiones(doc_id):
+    conexion = conectar()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute(
+        "SELECT d.id, d.documento, e.nombre FROM documentos d "
+        "JOIN empleados e ON e.id = d.empleado_id WHERE d.id = %s", (doc_id,))
+    doc = cursor.fetchone()
+    if doc is None:
+        cursor.close()
+        conexion.close()
+        abort(404)
+
+    # Solo las columnas que se muestran: NUNCA se trae el contenido (LONGBLOB) en un listado
+    cursor.execute(
+        "SELECT id, nombre_original, version, fecha_vencimiento, fecha_subida "
+        "FROM archivos WHERE documento_id = %s ORDER BY version DESC", (doc_id,))
+    archivos = cursor.fetchall()
+    cursor.close()
+    conexion.close()
+
+    ultima = 0
+    if len(archivos) > 0:
+        ultima = archivos[0]["version"]
+
+    lista = []
+    for a in archivos:
+        estado = estado_version(a["version"], ultima, a["fecha_vencimiento"])
+        if estado == "Vigente":
+            clase = "completo"
+        elif estado == "Vencido":
+            clase = "incompleto"
+        else:
+            clase = "anterior"
+        lista.append({"datos": a, "estado": estado, "clase": clase})
+    return render_template("versiones.html", doc=doc, archivos=lista)
+
+
+@app.route("/archivos/descargar/<int:archivo_id>")
+def descargar(archivo_id):
+    conexion = conectar()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT nombre_original, contenido FROM archivos WHERE id = %s", (archivo_id,))
+    fila = cursor.fetchone()
+    cursor.close()
+    conexion.close()
+    if fila is None:
+        abort(404)
+    return send_file(io.BytesIO(fila["contenido"]), as_attachment=True,
+                     download_name=fila["nombre_original"])
+
+
+@app.route("/archivos/ver/<int:archivo_id>")
+def ver_archivo(archivo_id):
+    # Muestra una imagen guardada en MySQL directamente en la página (no la descarga)
+    conexion = conectar()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT nombre_original, contenido FROM archivos WHERE id = %s", (archivo_id,))
+    fila = cursor.fetchone()
+    cursor.close()
+    conexion.close()
+    if fila is None or not es_imagen(fila["nombre_original"]):
+        abort(404)
+    if fila["nombre_original"].lower().endswith(".png"):
+        tipo = "image/png"
+    else:
+        tipo = "image/jpeg"
+    return
+
+
+# ---------------------------------------------------------------
 # ALEJANDRA PALMA: resumen con repetición, decisión y contadores
 # ---------------------------------------------------------------
 @app.route("/resumen")
