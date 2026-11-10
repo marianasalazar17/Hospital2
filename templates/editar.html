@@ -6,7 +6,7 @@
 Documento: <strong>{{ doc.documento }}</strong><br>
 Estado actual: <strong>{{ doc.estado }}</strong></p>
 {% if error %}<p class="error">{{ error }}</p>{% endif %}
-<form method="POST" action="/documentos/editar/{{ doc.id }}">
+<form method="POST" action="/documentos/editar/{{ doc.id }}" class="formulario">
 <label>Nuevo estado</label>
 <select name="estado">
 <option value="">-- Elige un estado --</option>
