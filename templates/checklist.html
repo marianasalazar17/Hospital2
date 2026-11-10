@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block titulo %}Checklist{% endblock %}
+{% block contenido %}
+<h1>Checklist por perfil</h1>
+<p class="sub">Los documentos que debe tener cada empleado según su perfil.</p>
+<table>
+<tr><th>Perfil</th><th>Cantidad</th><th>Documentos requeridos</th></tr>
+{% for perfil, docs in perfiles.items() %}
+<tr>
+<td><span class="perfil {{ perfil }}">{{ perfil|capitalize }}</span></td>
+<td>{{ docs|length }}</td>
+<td>{% for d in docs %}<span class="chip">{{ d }}</span>{% endfor %}</td>
+</tr>
+{% else %}
+<tr><td colspan="3">No hay checklist cargado.</td></tr>
+{% endfor %}
+</table>
+<div class="acciones"><a class="boton gris" href="/">Volver al dashboard</a></div>
+{% endblock %}

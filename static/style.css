@@ -1,46 +1,135 @@
-/* style.css - hoja de estilos única del sitio (PERSONA 4) */
-body { font-family: Arial, sans-serif; background: #eef2f9; color: #1f3a5f; margin: 0; padding: 24px 32px; }
-nav { margin-bottom: 20px; }
-nav a { display: inline-block; margin-right: 8px; padding: 8px 14px; background: #ffffff; color: #1f3a5f; text-decoration: none; border-radius: 6px; font-weight: bold; }
-nav a:hover { background: #1f3a5f; color: #ffffff; }
-h1 { margin-bottom: 4px; }
-.sub { color: #6b7a90; margin-top: 0; }
+/* style.css - hoja de estilos única del sitio
+   Identidad del Hospital de Diagnóstico: azul del logo (#3F5BBF), blanco y detalles en rojo */
+:root {
+  --azul: #3f5bbf;
+  --azul-osc: #1d2f7a;
+  --azul-claro: #e9eefb;
+  --fondo: #f4f6fb;
+  --texto: #1b2440;
+  --gris: #6b7690;
+  --borde: #dde3f2;
+  --verde: #2e7d4f;
+  --verde-bg: #e6f5ec;
+  --rojo: #c62828;
+  --rojo-bg: #fdecec;
+  --ambar: #8a6500;
+  --ambar-bg: #fff4d6;
+  --sombra: 0 2px 10px rgba(29, 47, 122, 0.10);
+}
 
-table { border-collapse: collapse; width: 100%; background: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-th { background: #1f3a5f; color: #ffffff; padding: 12px; text-align: left; }
-td { padding: 12px; border-bottom: 1px solid #e5e9f2; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; display: flex; flex-direction: column; font-family: "Montserrat", "Segoe UI", Arial, sans-serif; background: var(--fondo); color: var(--texto); line-height: 1.45; }
+a { color: var(--azul); }
+h1 { margin: 0 0 6px; color: var(--azul-osc); }
+h2.seccion { margin: 28px 0 10px; font-size: 18px; color: var(--azul-osc); }
+.sub { color: var(--gris); margin-top: 0; }
+
+/* ---------- Cabecera con el logo ---------- */
+.cabecera { background: var(--azul); display: flex; align-items: center; gap: 24px; padding: 10px 32px; flex-wrap: wrap; box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+.marca img { height: 54px; display: block; }
+.area { color: #dfe6ff; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; border-left: 1px solid rgba(255,255,255,0.35); padding-left: 20px; }
+.cabecera nav { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+.cabecera nav a { color: #ffffff; text-decoration: none; padding: 8px 14px; border-radius: 20px; font-weight: 600; font-size: 14px; }
+.cabecera nav a:hover { background: rgba(255,255,255,0.18); }
+.cabecera nav a.activo { background: #ffffff; color: var(--azul-osc); }
+
+.contenedor { max-width: 1220px; width: 100%; margin: 0 auto; padding: 24px 32px 40px; flex: 1; }
+
+/* ---------- Portada del dashboard ---------- */
+.hero { position: relative; overflow: hidden; border-radius: 16px; padding: 38px 40px; color: #ffffff; margin-bottom: 8px;
+  background-color: var(--azul-osc);
+  background-image: linear-gradient(110deg, rgba(29,47,122,0.95) 0%, rgba(63,91,191,0.85) 60%, rgba(63,91,191,0.55) 100%), url("portada.jpg");
+  background-size: cover; background-position: center; }
+.hero::after { content: ""; position: absolute; right: -30px; top: 50%; width: 360px; height: 190px; transform: translateY(-50%);
+  background: url("marca_blanca.png") no-repeat center / contain; opacity: 0.12; }
+.hero > div { position: relative; z-index: 1; max-width: 640px; }
+.hero h1 { color: #ffffff; font-size: 30px; }
+.hero p { margin: 8px 0; color: #e6ebff; }
+.hero-etiqueta { text-transform: uppercase; letter-spacing: 2px; font-size: 12px; font-weight: 700; }
+.hero-botones { margin-top: 18px !important; }
+
+/* ---------- Botones ---------- */
+.boton, button { display: inline-block; padding: 10px 20px; background: var(--azul); color: #ffffff; border: 0; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 14px; text-decoration: none; font-family: inherit; }
+.boton:hover, button:hover { background: var(--azul-osc); }
+.boton.claro { background: #ffffff; color: var(--azul-osc); }
+.boton.claro:hover { background: var(--azul-claro); }
+.boton.gris { background: #e3e8f5; color: var(--azul-osc); }
+.boton.gris:hover { background: #d3dbf0; }
+button.peligro { padding: 6px 12px; background: var(--rojo); font-size: 13px; }
+button.peligro:hover { background: #8e1c1c; }
+.acciones { margin: 14px 0; display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ---------- Tablas ---------- */
+table { border-collapse: collapse; width: 100%; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: var(--sombra); }
+th { background: var(--azul-osc); color: #ffffff; padding: 12px; text-align: left; font-size: 13px; letter-spacing: 0.3px; }
+td { padding: 11px 12px; border-bottom: 1px solid var(--borde); font-size: 14px; }
+tr:last-child td { border-bottom: 0; }
 td a { color: inherit; text-decoration: none; }
 td a:hover { text-decoration: underline; }
+td a.mini { font-size: 12px; color: var(--azul); font-weight: 600; }
 
-td.completo { background: #eaf7ea; color: #2f7a2f; font-weight: bold; }
-td.pendiente { background: #fbe9e9; color: #b02a2a; font-weight: bold; }
-td.incompleto { background: #fbe9e9; color: #b02a2a; font-weight: bold; }
-td.noaplica { background: #f1f1f1; color: #888888; font-style: italic; }
-td.sinchecklist { background: #fff4d6; color: #8a6500; font-weight: bold; }
+td.completo { background: var(--verde-bg); color: var(--verde); font-weight: 700; }
+td.pendiente { background: var(--rojo-bg); color: var(--rojo); font-weight: 700; }
+td.incompleto { background: var(--rojo-bg); color: var(--rojo); font-weight: 700; }
+td.noaplica { background: #f1f2f6; color: #8a92a6; font-style: italic; }
+td.sinchecklist { background: var(--ambar-bg); color: var(--ambar); font-weight: 700; }
+tr.anterior td { background: #eceff4; color: #6a7488; }
 
-.perfil { display: inline-block; padding: 3px 12px; border-radius: 12px; color: #ffffff; font-size: 13px; font-weight: bold; }
-.perfil.administrativo { background: #3b82f6; }
-.perfil.medico { background: #4f9a6a; }
-.perfil.enfermeria { background: #9b59b6; }
+.perfil { display: inline-block; padding: 3px 12px; border-radius: 12px; color: #ffffff; font-size: 12px; font-weight: 700; }
+.perfil.administrativo { background: #3f5bbf; }
+.perfil.medico { background: #2e8b9a; }
+.perfil.enfermeria { background: #8e5bb5; }
 
-label { display: block; margin-top: 14px; font-weight: bold; }
-input, select { padding: 8px; width: 280px; border: 1px solid #b8c2d4; border-radius: 6px; }
-button { margin-top: 18px; padding: 10px 20px; background: #1f6fe5; color: #ffffff; border: 0; border-radius: 6px; cursor: pointer; font-weight: bold; }
-button:hover { background: #1556b5; }
-button.peligro { margin-top: 0; padding: 6px 12px; background: #c0392b; }
-.error { color: #b02a2a; font-weight: bold; background: #fbe9e9; padding: 10px; border-radius: 6px; width: 460px; }
+.badge { display: inline-block; padding: 3px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; }
+.badge.completo { background: var(--verde-bg); color: var(--verde); }
+.badge.incompleto { background: var(--rojo-bg); color: var(--rojo); }
+.badge.sinchecklist { background: var(--ambar-bg); color: var(--ambar); }
+.badge.anterior { background: #eceff4; color: #6a7488; }
+.chip { display: inline-block; margin: 2px 4px 2px 0; padding: 3px 10px; border-radius: 12px; background: var(--azul-claro); color: var(--azul-osc); font-size: 12px; font-weight: 600; }
 
-.tarjetas { display: flex; gap: 16px; margin: 20px 0; }
-.tarjeta { padding: 18px 24px; border-radius: 10px; font-weight: bold; }
-.tarjeta .numero { display: block; font-size: 36px; }
-.tarjeta.completo { background: #eaf7ea; color: #2f7a2f; }
-.tarjeta.incompleto { background: #fbe9e9; color: #b02a2a; }
-.tarjeta.sinchecklist { background: #fff4d6; color: #8a6500; }
-/* Buscador del listado (mejora individual de Fernanda) */
-.buscador { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; }
-.buscador input { padding: 8px; border: 1px solid #bbb; border-radius: 6px; width: 280px; }
-.buscador a { color: #1a5fb4; font-size: 14px; }
+/* ---------- Formularios ---------- */
+label { display: block; margin-top: 14px; font-weight: 700; font-size: 14px; }
+input, select { padding: 9px; width: 300px; max-width: 100%; border: 1px solid #b8c2d4; border-radius: 8px; font-family: inherit; }
+input:focus, select:focus { outline: 2px solid var(--azul); border-color: var(--azul); }
+form button { margin-top: 18px; }
+td form button { margin-top: 0; }
+.formulario { background: #ffffff; padding: 8px 24px 24px; border-radius: 12px; box-shadow: var(--sombra); max-width: 560px; }
+.error { color: var(--rojo); font-weight: 700; background: var(--rojo-bg); padding: 10px 14px; border-radius: 8px; max-width: 560px; border-left: 4px solid var(--rojo); }
+.aviso { color: var(--ambar); background: var(--ambar-bg); padding: 12px 14px; border-radius: 8px; max-width: 640px; border-left: 4px solid #e0a800; }
 
-/* Barra de porcentaje (mejora de Alejandra) */
-.barra { width: 100%; max-width: 500px; height: 18px; background: #e3e3e3; border-radius: 9px; overflow: hidden; margin-bottom: 16px; }
-.relleno { height: 100%; background: #2e8b57; }
+/* ---------- Buscador ---------- */
+.buscador { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+.buscador input { width: 320px; }
+.buscador button { margin-top: 0; }
+.buscador a { font-size: 14px; }
+
+/* ---------- Tarjetas, barra y portales del dashboard ---------- */
+.tarjetas { display: flex; gap: 16px; margin: 12px 0 4px; flex-wrap: wrap; }
+.tarjeta { padding: 16px 24px; border-radius: 12px; font-weight: 700; min-width: 190px; box-shadow: var(--sombra); background: #ffffff; }
+.tarjeta .numero { display: block; font-size: 34px; line-height: 1.1; }
+.tarjeta.completo { background: var(--verde-bg); color: var(--verde); }
+.tarjeta.incompleto { background: var(--rojo-bg); color: var(--rojo); }
+.tarjeta.sinchecklist { background: var(--ambar-bg); color: var(--ambar); }
+
+.barra { width: 100%; max-width: 520px; height: 16px; background: #dfe4f2; border-radius: 8px; overflow: hidden; margin: 8px 0 14px; }
+.relleno { height: 100%; background: var(--verde); }
+
+.portales { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.portal { display: block; background: #ffffff; border-radius: 14px; padding: 20px 22px; text-decoration: none; color: var(--texto); box-shadow: var(--sombra); border-top: 4px solid var(--azul); transition: transform 0.12s; }
+.portal:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(29,47,122,0.18); }
+.portal .icono { font-size: 28px; display: block; margin-bottom: 6px; }
+.portal strong { display: block; color: var(--azul-osc); font-size: 17px; }
+.portal span.txt { color: var(--gris); font-size: 13px; }
+
+/* ---------- Imagen del Título ---------- */
+.visor { background: #ffffff; border-radius: 14px; padding: 18px; box-shadow: var(--sombra); max-width: 760px; }
+.visor img.principal { display: block; width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--borde); }
+.galeria { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+.galeria a { display: block; text-align: center; font-size: 12px; color: var(--gris); text-decoration: none; }
+.galeria img { height: 90px; border-radius: 6px; border: 1px solid var(--borde); display: block; }
+
+/* ---------- Pie de página ---------- */
+.pie { background: var(--azul-osc); color: #d7defa; padding: 22px 32px; font-size: 13px; }
+.pie .sedes { display: flex; gap: 28px; flex-wrap: wrap; margin-bottom: 8px; }
+.pie strong { color: #ffffff; }
+.pie .valores { color: #aab6ee; font-size: 12px; letter-spacing: 0.5px; }

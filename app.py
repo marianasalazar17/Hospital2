@@ -1,11 +1,42 @@
 # app.py - Expedientes Digitales, Hospital de Diagnóstico (Desafío 2: MySQL)
-import mysql.connector
-from datetime import datetime
-from flask import Flask, render_template, request, redirect
+import io 
+import mysql.connector 
+from datetime import datetime, date 
+from flask import Flask, render_template, request, redirect, send_file, abort 
 
-app = Flask(__name__)
+app = Flask(__name__) 
+
+# ---- Configuración de archivos (Tarea 3) ---- 
+EXTENSIONES_PERMITIDAS = (".pdf", ".doc", ".docx") 
+# El documento "Título" también acepta imágenes y se abre en una página con la imagen 
+EXTENSIONES_IMAGEN = (".png", ".jpg", ".jpeg") 
+DOCUMENTOS_CON_IMAGEN = ("Título",) 
+# 500 KB: queda por debajo del max_allowed_packet de 1M que trae XAMPP. 
+# Si suben max_allowed_packet a 16M en my.ini, pueden cambiarlo a 5 * 1024 * 1024. 
+TAMANO_MAXIMO = 500 * 1024 
+# Documentos que exigen fecha de vencimiento (confirmar con la ficha del Socio Formador)
+DOCUMENTOS_CON_VENCIMIENTO = ("DUI",) 
 
 
+def extension_valida(nombre, documento=""): 
+    # .lower() para que .PDF y .pdf cuenten igual 
+    permitidas = EXTENSIONES_PERMITIDAS 
+    if documento in DOCUMENTOS_CON_IMAGEN: 
+        # El Título acepta también .png y .jpg 
+        permitidas = EXTENSIONES_PERMITIDAS + EXTENSIONES_IMAGEN 
+        return nombre.lower().endswith(permitidas) 
+        
+def es_imagen(nombre): 
+    return nombre.lower().endswith(EXTENSIONES_IMAGEN) 
+    
+def estado_version(version, ultima, vencimiento): 
+    # Decide el estado de una versión de un archivo 
+    if version != ultima: 
+        return "Versión anterior" 
+    elif vencimiento is not None and vencimiento < date.today(): 
+        return "Vencido" 
+    else: 
+    return "Vigente"
 # ---------------------------------------------------------------
 # MARIANA SALAZAR: conexión a MySQL (XAMPP: usuario root, sin contraseña)
 # ---------------------------------------------------------------
@@ -25,9 +56,9 @@ def error_base_datos(error):
     # Si MySQL está apagado, la página sigue viva y avisa en vez de romperse
     return render_template("error_bd.html"), 503
 
-@app.route("/")
-def inicio():
-    return redirect("/empleados")
+@app.route("/") 
+def inicio(): 
+    # La página principal ahora es el dashboard (la función resumen) return resumen()
 
 # ---------------------------------------------------------------
 # FIORELLA FUNES: registrar empleado (con validación) y eliminar
@@ -270,11 +301,37 @@ def detalle(emp_id):
         cursor.close()
         conexion.close()
         return redirect("/empleados")
-    cursor.execute("SELECT id, documento, estado FROM documentos WHERE empleado_id = %s ORDER BY id", (emp_id,))
-    docs = cursor.fetchall()
-    cursor.close()
-    conexion.close()
-    return render_template("detalle.html", emp=emp, docs=docs)
+    # Cada documento con cuántas versiones tiene (sin traer el LONGBLOB) 
+    cursor.execute( 
+        "SELECT d.id, d.documento, d.estado, COUNT(a.id) AS versiones, MAX(a.version) AS ultima " 
+        "FROM documentos d LEFT JOIN archivos a ON a.documento_id = d.id " 
+    "WHERE d.empleado_id = %s GROUP BY d.id, d.documento, d.estado ORDER BY d.id", (emp_id,))
+  docs = cursor.fetchall() 
+cursor.close() 
+conexion.close() 
+# El documento "Título" se abre en la página de imagen; los demás, en la de versiones 
+for d in docs: 
+    d["imagen"] = d["documento"] in DOCUMENTOS_CON_IMAGEN 
+    return render_template("detalle.html", emp=emp, docs=docs) 
+    
+# --------------------------------------------------------------
+# MARIANA SALAZAR: tabla del checklist (qué documentos exige cada perfil) 
+# --------------------------------------------------------------
+@app.route("/checklist") 
+def ver_checklist(): 
+    conexion = conectar() 
+    cursor = conexion.cursor(dictionary=True) 
+    cursor.execute("SELECT perfil, documento FROM checklist ORDER BY id") 
+    filas = cursor.fetchall() 
+    cursor.close() 
+    conexion.close() 
+    
+# Se agrupan los documentos por perfil 
+perfiles = {} 
+for f in filas: 
+if f["perfil"] not in perfiles: 
+    perfiles[f["perfil"]] = [] perfiles[f["perfil"]].append(f["documento"]) 
+return render_template("checklist.html", perfiles=perfiles)
 # ---------------------------------------------------------------
 # FERNANDA POCASANGRE: modificar el estado de un documento (con validación)
 # ---------------------------------------------------------------

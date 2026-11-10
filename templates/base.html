@@ -2,15 +2,32 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% block titulo %}{% endblock %} - Hospital de Diagnóstico</title>
+<link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap">
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+<header class="cabecera">
+<a class="marca" href="/"><img src="{{ url_for('static', filename='logo_blanco.png') }}" alt="Hospital de Diagnóstico - Excelencia en medicina"></a>
+<span class="area">Expedientes digitales del personal</span>
 <nav>
-<a href="/empleados">Expedientes</a>
-<a href="/empleados/nuevo">Registrar empleado</a>
-<a href="/resumen">Resumen</a>
+<a href="/" class="{% if request.path == '/' %}activo{% endif %}">Dashboard</a>
+<a href="/empleados" class="{% if request.path == '/empleados' %}activo{% endif %}">Empleados</a>
+<a href="/empleados/nuevo" class="{% if request.path == '/empleados/nuevo' %}activo{% endif %}">Registrar empleado</a>
 </nav>
+</header>
+<main class="contenedor">
 {% block contenido %}{% endblock %}
+</main>
+<footer class="pie">
+<div class="sedes">
+<span><strong>Colonia Médica</strong> · 2505-5700</span>
+<span><strong>Colonia Escalón</strong> · 2506-2000</span>
+<span><strong>Santa Elena</strong> · 2304-4000</span>
+</div>
+<div class="valores">Respeto · Honestidad · Responsabilidad · Compromiso · Sensibilidad · Profesionalismo · Entrega</div>
+</footer>
 </body>
 </html>
