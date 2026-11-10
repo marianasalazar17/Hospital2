@@ -239,6 +239,8 @@ def subir(doc_id):
 def listar():
     # MEJORA INDIVIDUAL: el texto escrito en el buscador (?q=...) filtra por nombre o perfil
     q = request.args.get("q", "").strip()
+    # NUEVO: ?perfil=medico muestra solo ese perfil (una tabla más corta)
+    perfil = request.args.get("perfil", "").strip()
     conexion = conectar()
     cursor = conexion.cursor(dictionary=True)
 
