@@ -370,89 +370,102 @@ def editar(doc_id):
 # ---------------------------------------------------------------
 @app.route("/resumen")
 def resumen():
-conexion = conectar()
-cursor = conexion.cursor(dictionary=True)
-cursor.execute("SELECT * FROM empleados ORDER BY id")
-empleados = cursor.fetchall()
-completos = 0
-incompletos = 0
-sin_checklist = 0
-docs_vigentes = 0
-docs_vencidos = 0
-docs_sin_archivo = 0
-detalle = []
-for emp in empleados:
-# Última versión de cada documento requerido (sin traer el LONGBLOB)
-cursor.execute(
-"SELECT d.documento, a.version, a.fecha_vencimiento FROM documentos d "
-"LEFT JOIN archivos a ON a.documento_id = d.id "
-"AND a.version = (SELECT MAX(version) FROM archivos WHERE documento_id = d.id) "
-"WHERE d.empleado_id = %s", (emp["id"],))
-docs = cursor.fetchall()
-total = len(docs)
-vigentes = 0
-vencidos = 0
-sin_archivo = 0
-# Repetición: se recorre cada documento del empleado y se decide su estado
-for d in docs:
-if d["version"] is None:
-sin_archivo = sin_archivo + 1
-elif d["fecha_vencimiento"] is not None and d["fecha_vencimiento"] < date.today():
-vencidos = vencidos + 1
-else:
-vigentes = vigentes + 1
-# Decisión: clasificar el expediente completo
-if total == 0:
-clase = "sinchecklist"
-texto = "Sin documentos requeridos"
-sin_checklist = sin_checklist + 1
-elif vigentes == total:
-clase = "completo"
-texto = "Completo"
-completos = completos + 1
-else:
-clase = "incompleto"
-texto = "Incompleto"
-incompletos = incompletos + 1
-docs_vigentes = docs_vigentes + vigentes
-docs_vencidos = docs_vencidos + vencidos
-docs_sin_archivo = docs_sin_archivo + sin_archivo
-detalle.append({"nombre": emp["nombre"], "perfil": emp["perfil"],
-"vigentes": vigentes, "vencidos": vencidos,
-"sin_archivo": sin_archivo, "total": total,
-"clase": clase, "texto": texto})
-cursor.close()
-conexion.close()
-if len(empleados) > 0:
-porcentaje = round(completos / len(empleados) * 100)
-else:
-porcentaje = 0
-return render_template("resumen.html", detalle=detalle, completos=completos,
-incompletos=incompletos, sin_checklist=sin_checklist,
-docs_vigentes=docs_vigentes, docs_vencidos=docs_vencidos,
-docs_sin_archivo=docs_sin_archivo,
-total=len(empleados), porcentaje=porcentaje)
+    conexion = conectar()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM empleados ORDER BY id")
+    empleados = cursor.fetchall()
+
+    completos = 0
+    incompletos = 0
+    sin_checklist = 0
+    docs_vigentes = 0
+    docs_vencidos = 0
+    docs_sin_archivo = 0
+    detalle = []
+
+    for emp in empleados:
+        # Última versión de cada documento requerido (sin traer el LONGBLOB)
+        cursor.execute(
+            "SELECT d.documento, a.version, a.fecha_vencimiento FROM documentos d "
+            "LEFT JOIN archivos a ON a.documento_id = d.id "
+            "AND a.version = (SELECT MAX(version) FROM archivos WHERE documento_id = d.id) "
+            "WHERE d.empleado_id = %s", (emp["id"],))
+        docs = cursor.fetchall()
+        total = len(docs)
+        vigentes = 0
+        vencidos = 0
+        sin_archivo = 0
+
+        # Repetición: se recorre cada documento del empleado y se decide su estado
+        for d in docs:
+            if d["version"] is None:
+                sin_archivo = sin_archivo + 1
+            elif d["fecha_vencimiento"] is not None and d["fecha_vencimiento"] < date.today():
+                vencidos = vencidos + 1
+            else:
+                vigentes = vigentes + 1
+
+        # Decisión: clasificar el expediente completo
+        if total == 0:
+            clase = "sinchecklist"
+            texto = "Sin documentos requeridos"
+            sin_checklist = sin_checklist + 1
+        elif vigentes == total:
+            clase = "completo"
+            texto = "Completo"
+            completos = completos + 1
+        else:
+            clase = "incompleto"
+            texto = "Incompleto"
+            incompletos = incompletos + 1
+
+        docs_vigentes = docs_vigentes + vigentes
+        docs_vencidos = docs_vencidos + vencidos
+        docs_sin_archivo = docs_sin_archivo + sin_archivo
+
+        detalle.append({"nombre": emp["nombre"], "perfil": emp["perfil"],
+                        "vigentes": vigentes, "vencidos": vencidos,
+                        "sin_archivo": sin_archivo, "total": total,
+                        "clase": clase, "texto": texto})
+
+    cursor.close()
+    conexion.close()
+    if len(empleados) > 0:
+        porcentaje = round(completos / len(empleados) * 100)
+    else:
+        porcentaje = 0
+    return render_template("resumen.html", detalle=detalle, completos=completos,
+                           incompletos=incompletos, sin_checklist=sin_checklist,
+                           docs_vigentes=docs_vigentes, docs_vencidos=docs_vencidos,
+                           docs_sin_archivo=docs_sin_archivo,
+                           total=len(empleados), porcentaje=porcentaje)
+
+
 # ---------------------------------------------------------------
 # ALEJANDRA PALMA: tabla de documentos (todos los documentos de todos los empleados)
 # ---------------------------------------------------------------
 @app.route("/documentos")
 def listar_documentos():
-conexion = conectar()
-cursor = conexion.cursor(dictionary=True)
-cursor.execute(
-"SELECT d.id, d.documento, d.estado, e.id AS emp_id, e.nombre, COUNT(a.id) AS versiones "
-"FROM documentos d JOIN empleados e ON e.id = d.empleado_id "
-"LEFT JOIN archivos a ON a.documento_id = d.id "
-"GROUP BY d.id, d.documento, d.estado, e.id, e.nombre ORDER BY e.nombre, d.id")
-filas = cursor.fetchall()
-cursor.close()
-conexion.close()
-# Repetición: marca cuáles son el Título y cuenta los documentos sin archivo
-sin_archivo = 0
-for f in filas:
-f["imagen"] = f["documento"] in DOCUMENTOS_CON_IMAGEN
-if f["versiones"] == 0:
-sin_archivo = sin_archivo + 1
-return render_template("documentos.html", filas=filas, total=len(filas), sin_archivo=sin_archivo)
+    conexion = conectar()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute(
+        "SELECT d.id, d.documento, d.estado, e.id AS emp_id, e.nombre, COUNT(a.id) AS versiones "
+        "FROM documentos d JOIN empleados e ON e.id = d.empleado_id "
+        "LEFT JOIN archivos a ON a.documento_id = d.id "
+        "GROUP BY d.id, d.documento, d.estado, e.id, e.nombre ORDER BY e.nombre, d.id")
+    filas = cursor.fetchall()
+    cursor.close()
+    conexion.close()
+
+    # Repetición: marca cuáles son el Título y cuenta los documentos sin archivo
+    sin_archivo = 0
+    for f in filas:
+        f["imagen"] = f["documento"] in DOCUMENTOS_CON_IMAGEN
+        if f["versiones"] == 0:
+            sin_archivo = sin_archivo + 1
+    return render_template("documentos.html", filas=filas, total=len(filas), sin_archivo=sin_archivo)
+
+
 if __name__ == "__main__":
-app.run(debug=True)
+    app.run(debug=True)
+
