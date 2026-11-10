@@ -133,3 +133,10 @@ td form button { margin-top: 0; }
 .pie .sedes { display: flex; gap: 28px; flex-wrap: wrap; margin-bottom: 8px; }
 .pie strong { color: #ffffff; }
 .pie .valores { color: #aab6ee; font-size: 12px; letter-spacing: 0.5px; }
+
+
+/* ---------- Pestañas para dividir las tablas (por perfil y por tipo de documento) ---------- */
+.pestanas { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 18px; }
+.pestanas a { padding: 7px 16px; border-radius: 20px; background: #ffffff; color: var(--azul-osc); text-decoration: none; font-weight: 600; font-size: 14px; border: 1px solid #c9d2f2; }
+.pestanas a:hover { background: var(--azul-claro); }
+.pestanas a.activa { background: var(--azul); color: #ffffff; border-color: var(--azul); }

@@ -239,10 +239,16 @@ def subir(doc_id):
 def listar():
     # MEJORA INDIVIDUAL: el texto escrito en el buscador (?q=...) filtra por nombre o perfil
     q = request.args.get("q", "").strip()
+    # NUEVO: ?perfil=medico muestra solo ese perfil (una tabla más corta)
+    perfil = request.args.get("perfil", "").strip()
     conexion = conectar()
     cursor = conexion.cursor(dictionary=True)
 
-    cursor.execute("SELECT documento FROM checklist GROUP BY documento ORDER BY MIN(id)")
+    # Si hay perfil, solo salen las columnas de los documentos que ese perfil exige
+    if perfil != "":
+        cursor.execute("SELECT documento FROM checklist WHERE perfil = %s ORDER BY id", (perfil,))
+    else:
+        cursor.execute("SELECT documento FROM checklist GROUP BY documento ORDER BY MIN(id)")
     todos = []
     for fila in cursor.fetchall():
         todos.append(fila["documento"])
@@ -274,6 +280,9 @@ def listar():
     filas = []
     for emp_id in empleados:
         info = empleados[emp_id]
+                # Si se pidió un perfil, se saltan los empleados de otros perfiles
+        if perfil != "" and info["emp"]["perfil"] != perfil:
+            continue
         celdas = []
         pendientes = 0
         for nombre_doc in todos:
@@ -291,7 +300,7 @@ def listar():
         else:
             expediente = "Incompleto"
         filas.append({"emp": info["emp"], "celdas": celdas, "expediente": expediente})
-    return render_template("empleados.html", filas=filas, documentos=todos, q=q)
+        return render_template("empleados.html", filas=filas, documentos=todos, q=q, perfil=perfil)
 
 # --------------------------------------------------------------
 # MARIANA SALAZAR (mejora): página de detalle de un empleado 
@@ -557,6 +566,8 @@ def resumen():
 # ---------------------------------------------------------------
 @app.route("/documentos")
 def listar_documentos():
+        # NUEVO: ?tipo=Solvencia PNP muestra solo ese documento de todos los empleados
+    tipo = request.args.get("tipo", "").strip()
     conexion = conectar()
     cursor = conexion.cursor(dictionary=True)
     cursor.execute(
@@ -569,13 +580,15 @@ def listar_documentos():
     conexion.close()
 
     # Repetición: marca cuáles son el Título y cuenta los documentos sin archivo
-    sin_archivo = 0
+        sin_archivo = 0
+    mostrar = []
     for f in filas:
-        f["imagen"] = f["documento"] in DOCUMENTOS_CON_IMAGEN
-        if f["versiones"] == 0:
-            sin_archivo = sin_archivo + 1
-    return render_template("documentos.html", filas=filas, total=len(filas), sin_archivo=sin_archivo)
-
+        if tipo == "" or f["documento"] == tipo:
+            f["imagen"] = f["documento"] in DOCUMENTOS_CON_IMAGEN
+            if f["versiones"] == 0:
+                sin_archivo = sin_archivo + 1
+            mostrar.append(f)
+    return render_template("documentos.html", filas=mostrar, total=len(mostrar), sin_archivo=sin_archivo, tipo=tipo)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,12 +1,18 @@
 {% extends "base.html" %}
 {% block titulo %}Empleados{% endblock %}
 {% block contenido %}
-<h1>Empleados</h1>
-<p class="sub">Expediente de cada empleado y estado de sus documentos.</p>
+{% set nombres = {"administrativo": "Administrativo", "medico": "Médico", "enfermeria": "Enfermería"} %}
+<h1>Empleados{% if perfil %} · {{ nombres.get(perfil, perfil) }}{% endif %}</h1>
+<p class="sub">{% if perfil %}Solo el perfil {{ nombres.get(perfil, perfil) }}, con los documentos que ese perfil exige.{% else %}Expediente de cada empleado y estado de sus documentos.{% endif %}</p>
+<nav class="pestanas">
+<a href="/empleados" class="{% if not perfil %}activa{% endif %}">Todos</a>
+{% for p in nombres %}<a href="/empleados?perfil={{ p }}" class="{% if perfil == p %}activa{% endif %}">{{ nombres[p] }}</a>{% endfor %}
+</nav>
 <form method="GET" action="/empleados" class="buscador">
+<input type="hidden" name="perfil" value="{{ perfil }}">
 <input type="text" name="q" value="{{ q }}" placeholder="Buscar por nombre, perfil o archivo">
 <button type="submit">Buscar</button>
-{% if q %}<a href="/empleados">Quitar filtro</a>{% endif %}
+{% if q %}<a href="/empleados{% if perfil %}?perfil={{ perfil }}{% endif %}">Quitar filtro</a>{% endif %}
 </form>
 <table>
 <tr>

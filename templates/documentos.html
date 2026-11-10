@@ -1,8 +1,13 @@
 {% extends "base.html" %}
 {% block titulo %}Documentos{% endblock %}
 {% block contenido %}
-<h1>Documentos del personal</h1>
-<p class="sub">{{ total }} documentos en total · {{ sin_archivo }} todavía sin archivo subido</p>
+{% set tipos = ["DUI", "Título", "Antecedentes Penal", "Solvencia PNP", "Colegiatura médica", "Especialidad", "Junta de Vigilancia"] %}
+<h1>{% if tipo %}{{ tipo }}{% else %}Documentos del personal{% endif %}</h1>
+<p class="sub">{{ total }} documento{% if total != 1 %}s{% endif %} {% if tipo %}de tipo {{ tipo }}{% else %}en total{% endif %} · {{ sin_archivo }} todavía sin archivo subido</p>
+<nav class="pestanas">
+<a href="/documentos" class="{% if not tipo %}activa{% endif %}">Todos</a>
+{% for t in tipos %}<a href="/documentos?tipo={{ t|urlencode }}" class="{% if tipo == t %}activa{% endif %}">{{ t }}</a>{% endfor %}
+</nav>
 <table>
 <tr><th>Empleado</th><th>Documento</th><th>Estado</th><th>Versiones</th><th>Acciones</th></tr>
 {% for f in filas %}
