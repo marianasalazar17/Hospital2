@@ -588,7 +588,7 @@ def listar_documentos():
     conexion.close()
 
     # Repetición: marca cuáles son el Título y cuenta los documentos sin archivo
-        sin_archivo = 0
+    sin_archivo = 0
     mostrar = []
     for f in filas:
         if tipo == "" or f["documento"] == tipo:
