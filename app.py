@@ -309,6 +309,7 @@ def listar():
     return render_template("empleados.html", filas=filas, documentos=todos, q=q, perfil=perfil)
 
 
+
 # MARIANA SALAZAR (mejora): página de detalle de un empleado 
 # --------------------------------------------------------------
 @app.route("/empleados/<int:emp_id>")
