@@ -306,7 +306,8 @@ def listar():
         else:
             expediente = "Incompleto"
         filas.append({"emp": info["emp"], "celdas": celdas, "expediente": expediente})
-        return render_template("empleados.html", filas=filas, documentos=todos, q=q, perfil=perfil)
+      return render_template("empleados.html", filas=filas, documentos=todos, q=q, perfil=perfil)
+
 
 # MARIANA SALAZAR (mejora): página de detalle de un empleado 
 # --------------------------------------------------------------
@@ -588,7 +589,8 @@ def listar_documentos():
     conexion.close()
 
     # Repetición: marca cuáles son el Título y cuenta los documentos sin archivo
-        sin_archivo = 0
+        
+    sin_archivo = 0
     mostrar = []
     for f in filas:
         if tipo == "" or f["documento"] == tipo:
