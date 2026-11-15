@@ -5,7 +5,6 @@
 <p>Empleado: <strong>{{ doc.nombre }}</strong><br>
 Documento: <strong>{{ doc.documento }}</strong><br>
 Estado actual: <strong>{{ doc.estado }}</strong></p>
-{% if error %}<p class="error">{{ error }}</p>{% endif %}
 <form method="POST" action="/documentos/editar/{{ doc.id }}" class="formulario">
 <label>Nuevo estado</label>
 <select name="estado">
