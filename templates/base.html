@@ -20,6 +20,17 @@
 </header>
 <main class="contenedor">
 {% block contenido %}{% endblock %}
+{% if error %}
+<div class="modal-fondo" id="modal-error" onclick="if(event.target===this)cerrarModal()">
+<div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="modal-titulo">
+<img class="modal-icono" src="{{ url_for('static', filename='iconos/alerta.svg') }}" alt="">
+<h2 id="modal-titulo">Revisa este dato</h2>
+<p>{{ error }}</p>
+<button type="button" onclick="cerrarModal()">Entendido</button>
+</div>
+</div>
+<script>function cerrarModal(){var m=document.getElementById('modal-error');if(m){m.remove();}}</script>
+{% endif %}
 </main>
 <footer class="pie">
 <div class="sedes">
