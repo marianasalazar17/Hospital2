@@ -140,3 +140,26 @@ td form button { margin-top: 0; }
 .pestanas a { padding: 7px 16px; border-radius: 20px; background: #ffffff; color: var(--azul-osc); text-decoration: none; font-weight: 600; font-size: 14px; border: 1px solid #c9d2f2; }
 .pestanas a:hover { background: var(--azul-claro); }
 .pestanas a.activa { background: var(--azul); color: #ffffff; border-color: var(--azul); }
+
+/* ---- Cambios de la profesora: iconos, requisitos, modales y perfil ---- */
+img.icono { width: 44px; height: 44px; display: block; margin-bottom: 6px; }
+.registro { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+.formulario { display: flex; flex-direction: column; gap: 6px; }
+.requisitos { background: #fff; border-radius: 12px; padding: 16px 20px; box-shadow: 0 2px 8px rgba(31,47,122,.08); }
+.requisitos h2 { margin: 0 0 8px; font-size: 18px; color: var(--azul, #1F2F7A); }
+.requisitos table { width: 100%; }
+.requisitos td.pendiente { color: #C92A2A; font-weight: 600; }
+.acciones-fila { white-space: nowrap; }
+.acciones-fila form { display: inline; }
+.estado-expediente { font-weight: 700; padding: 6px 12px; border-radius: 8px; display: inline-block; }
+.estado-expediente.completo { background: #E6F7EC; color: #2F9E44; }
+.estado-expediente.incompleto { background: #FDECEC; color: #C92A2A; }
+.modal-fondo { position: fixed; inset: 0; background: rgba(15,23,42,.55); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 1000; }
+.modal { background: #fff; border-radius: 14px; padding: 24px 26px; max-width: 420px; width: 100%; text-align: center; box-shadow: 0 16px 40px rgba(0,0,0,.25); }
+.modal-icono { width: 64px; height: 64px; margin-bottom: 8px; }
+.modal h2 { margin: 6px 0 8px; font-size: 20px; color: #1F2F7A; }
+.modal p { margin: 0 0 16px; }
+.modal button { min-width: 140px; }
+@media (max-width: 720px) {
+  .registro { grid-template-columns: 1fr; }
+}
