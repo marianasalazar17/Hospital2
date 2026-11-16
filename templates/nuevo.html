@@ -2,21 +2,51 @@
 {% block titulo %}Registrar empleado{% endblock %}
 {% block contenido %}
 <h1>Registrar empleado</h1>
-{% if error %}<p class="error">{{ error }}</p>{% endif %}
-<form method="POST" action="/empleados/nuevo">
-<label>Nombre</label>
-<input type="text" name="nombre" value="{{ datos.nombre }}">
-<label>Perfil</label>
-<select name="perfil">
+<p class="sub">Al guardar, el empleado queda con todos los documentos de su perfil en Pendiente.</p>
+<!-- Los errores ya no van aquí: base.html los muestra en la ventana "Revisa este dato" -->
+<div class="registro">
+<form method="POST" action="/empleados/nuevo" class="formulario">
+<label for="nombre">Nombre</label>
+<input type="text" id="nombre" name="nombre" value="{{ datos.nombre }}">
+<label for="perfil">Perfil</label>
+<select id="perfil" name="perfil" onchange="mostrarRequisitos()">
 <option value="">-- Elige un perfil --</option>
 {% for p in perfiles %}
 <option value="{{ p }}" {% if datos.perfil == p %}selected{% endif %}>{{ p|capitalize }}</option>
 {% endfor %}
 </select>
-<label>Fecha de ingreso (AAAA-MM-DD)</label>
-<input type="text" name="fecha_ingreso" value="{{ datos.fecha_ingreso }}" placeholder="2024-05-20">
-<label>Correo</label>
-<input type="text" name="correo" value="{{ datos.correo }}" placeholder="nombre@hospital.com">
+<label for="fecha_ingreso">Fecha de ingreso</label>
+<!-- type="date" muestra un calendario y siempre envía la fecha como AAAA-MM-DD -->
+<input type="date" id="fecha_ingreso" name="fecha_ingreso" value="{{ datos.fecha_ingreso }}">
+<label for="correo">Correo</label>
+<input type="text" id="correo" name="correo" value="{{ datos.correo }}" placeholder="nombre@hospital.com">
 <button type="submit">Guardar</button>
 </form>
+
+<section class="requisitos">
+<h2>Documentos requeridos</h2>
+<p id="requisitos-vacio">Elige un perfil para ver qué documentos le tocan.</p>
+{% for p, docs in requisitos.items() %}
+<table class="tabla-requisitos" data-perfil="{{ p }}" hidden>
+<tr><th>Documento</th><th>Estado</th></tr>
+{% for d in docs %}
+<tr><td>{{ d }}</td><td class="pendiente">Pendiente</td></tr>
+{% endfor %}
+</table>
+{% endfor %}
+</section>
+</div>
+
+<script>
+// Muestra solo la tabla del perfil elegido
+function mostrarRequisitos() {
+  var perfil = document.getElementById("perfil").value;
+  var tablas = document.querySelectorAll(".tabla-requisitos");
+  for (var i = 0; i < tablas.length; i++) {
+    tablas[i].hidden = (tablas[i].dataset.perfil !== perfil);
+  }
+  document.getElementById("requisitos-vacio").hidden = (perfil !== "");
+}
+mostrarRequisitos();
+</script>
 {% endblock %}
