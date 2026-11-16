@@ -1,46 +1,17 @@
-{% extends "base.html" %}
-{% block titulo %}Empleados{% endblock %}
-{% block contenido %}
-{% set nombres = {"administrativo": "Administrativo", "medico": "Médico", "enfermeria": "Enfermería"} %}
-<h1>Empleados{% if perfil %} · {{ nombres.get(perfil, perfil) }}{% endif %}</h1>
-<p class="sub">{% if perfil %}Solo el perfil {{ nombres.get(perfil, perfil) }}, con los documentos que ese perfil exige.{% else %}Expediente de cada empleado y estado de sus documentos.{% endif %}</p>
-<nav class="pestanas">
-<a href="/empleados" class="{% if not perfil %}activa{% endif %}">Todos</a>
-{% for p in nombres %}<a href="/empleados?perfil={{ p }}" class="{% if perfil == p %}activa{% endif %}">{{ nombres[p] }}</a>{% endfor %}
-</nav>
-<form method="GET" action="/empleados" class="buscador">
-<input type="hidden" name="perfil" value="{{ perfil }}">
-<input type="text" name="q" value="{{ q }}" placeholder="Buscar por nombre, perfil o archivo">
-<button type="submit">Buscar</button>
-{% if q %}<a href="/empleados{% if perfil %}?perfil={{ perfil }}{% endif %}">Quitar filtro</a>{% endif %}
-</form>
-<table>
-<tr>
-<th>Empleado</th><th>Perfil</th>
-{% for d in documentos %}<th>{{ d }}</th>{% endfor %}
-<th>Expediente</th><th>Acciones</th>
-</tr>
-{% for f in filas %}
-<tr>
-<td><a href="/empleados/{{ f.emp.id }}">{{ f.emp.nombre }}</a></td>
-<td><span class="perfil {{ f.emp.perfil }}">{{ f.emp.perfil|capitalize }}</span></td>
-{% for c in f.celdas %}
-<td class="{{ c.estado|lower|replace(' ', '') }}">
-{% if c.id %}
-<a href="/documentos/editar/{{ c.id }}">{{ c.estado }}</a><br>
-{% if c.imagen %}<a class="mini" href="/documentos/{{ c.id }}/imagen">Ver imagen</a>{% else %}<a class="mini" href="/documentos/{{ c.id }}/versiones">Archivos</a>{% endif %}
-{% else %}{{ c.estado }}{% endif %}
-</td>
-{% endfor %}
-<td class="{{ f.expediente|lower }}">{{ f.expediente }}</td>
-<td>
-<form method="POST" action="/empleados/eliminar/{{ f.emp.id }}" onsubmit="return confirm('¿Eliminar a {{ f.emp.nombre|e }}?');">
-<button type="submit" class="peligro">Eliminar</button>
-</form>
-</td>
-</tr>
-{% endfor %}
-</table>
-{% if filas|length == 0 %}<p>{% if q %}No se encontraron empleados con "{{ q }}".{% else %}No hay empleados registrados.{% endif %}</p>{% endif %}
-<div class="acciones"><a class="boton gris" href="/">Volver al dashboard</a></div>
+{% extends "base.html" %} {% block titulo %}Empleados{% endblock %} {% block contenido %} {% set nombres = {"administrativo": "Administrativo", "medico": "Médico", "enfermeria": "Enfermería"} %}
+Empleados{% if perfil %} · {{ nombres.get(perfil, perfil) }}{% endif %}
+Elige un empleado para ver su perfil y sus documentos.
+
+Todos {% for p in nombres %}{{ nombres[p] }}{% endfor %}
+{{ q }}
+ Buscar {% if q %}Quitar filtro{% endif %}
+{% for f in filas %} {% endfor %}
+Empleado	Perfil	Documentos completos	Expediente	Acciones
+{{ f.emp.nombre }}	{{ f.emp.perfil|capitalize }}	{{ f.celdas|selectattr('estado','equalto','Completo')|list|length }} de {{ f.celdas|rejectattr('estado','equalto','No aplica')|list|length }}	{{ f.expediente }}	Ver perfil
+Eliminar
+{% if filas|length == 0 %}
+{% if q %}No se encontraron empleados con "{{ q }}".{% else %}No hay empleados registrados.{% endif %}
+
+{% endif %}
+Volver al dashboard
 {% endblock %}
