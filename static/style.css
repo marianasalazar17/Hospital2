@@ -160,6 +160,8 @@ img.icono { width: 44px; height: 44px; display: block; margin-bottom: 6px; }
 .modal h2 { margin: 6px 0 8px; font-size: 20px; color: #1F2F7A; }
 .modal p { margin: 0 0 16px; }
 .modal button { min-width: 140px; }
+.modal-fondo[hidden] { display: none; }
+.modal button.peligro { padding: 10px 16px; font-size: 15px; }
 @media (max-width: 720px) {
   .registro { grid-template-columns: 1fr; }
 }

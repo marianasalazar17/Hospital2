@@ -155,7 +155,9 @@ def eliminar(emp_id):
     if con_avance > 0:
         cursor.close()
         conexion.close()
-        return render_template("no_eliminar.html", emp=emp, con_avance=con_avance), 409
+        # El motivo también sale en la ventana "Revisa este dato" (base.html)
+        error = "No se puede eliminar a " + emp["nombre"] + ": tiene documentos con avance."
+        return render_template("no_eliminar.html", emp=emp, con_avance=con_avance, error=error), 409
 
     # ON DELETE CASCADE borra solo los documentos del empleado (no quedan huérfanos)
     cursor.execute("DELETE FROM empleados WHERE id = %s", (emp_id,))
