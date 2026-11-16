@@ -30,16 +30,16 @@
 
 <h2 class="seccion">Tablas</h2>
 <div class="portales">
-<a class="portal" href="/empleados"><span class="icono">👥</span><strong>Empleados</strong><span class="txt">Cada empleado con el estado de sus documentos</span></a>
-<a class="portal" href="/documentos"><span class="icono">📄</span><strong>Documentos</strong><span class="txt">Todos los documentos, sus versiones y archivos</span></a>
-<a class="portal" href="/checklist"><span class="icono">✅</span><strong>Checklist por perfil</strong><span class="txt">Qué documentos exige cada perfil</span></a>
+<a class="portal" href="/empleados"><img class="icono" src="{{ url_for('static', filename='iconos/empleados.svg') }}" alt=""><strong>Empleados</strong><span class="txt">Cada empleado con el estado de sus documentos</span></a>
+<a class="portal" href="/documentos"><img class="icono" src="{{ url_for('static', filename='iconos/documentos.svg') }}" alt=""><strong>Documentos</strong><span class="txt">Todos los documentos, sus versiones y archivos</span></a>
+<a class="portal" href="/checklist"><img class="icono" src="{{ url_for('static', filename='iconos/checklist.svg') }}" alt=""><strong>Checklist por perfil</strong><span class="txt">Qué documentos exige cada perfil</span></a>
 </div>
 
 <h2 class="seccion">Empleados por perfil</h2>
 <div class="portales">
-<a class="portal" href="/empleados?perfil=administrativo"><span class="icono">🗂️</span><strong>Administrativo</strong><span class="txt">Solo el personal administrativo</span></a>
-<a class="portal" href="/empleados?perfil=medico"><span class="icono">🩺</span><strong>Médico</strong><span class="txt">Solo los médicos</span></a>
-<a class="portal" href="/empleados?perfil=enfermeria"><span class="icono">💉</span><strong>Enfermería</strong><span class="txt">Solo el personal de enfermería</span></a>
+<a class="portal" href="/empleados?perfil=administrativo"><img class="icono" src="{{ url_for('static', filename='iconos/administrativo.svg') }}" alt=""><strong>Administrativo</strong><span class="txt">Solo el personal administrativo</span></a>
+<a class="portal" href="/empleados?perfil=medico"><img class="icono" src="{{ url_for('static', filename='iconos/medico.svg') }}" alt=""><strong>Médico</strong><span class="txt">Solo los médicos</span></a>
+<a class="portal" href="/empleados?perfil=enfermeria"><img class="icono" src="{{ url_for('static', filename='iconos/enfermeria.svg') }}" alt=""><strong>Enfermería</strong><span class="txt">Solo el personal de enfermería</span></a>
 </div>
 
 <h2 class="seccion">Documentos por tipo</h2>
