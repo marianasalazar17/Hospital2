@@ -1,17 +1,58 @@
-{% extends "base.html" %} {% block titulo %}Empleados{% endblock %} {% block contenido %} {% set nombres = {"administrativo": "Administrativo", "medico": "Médico", "enfermeria": "Enfermería"} %}
-Empleados{% if perfil %} · {{ nombres.get(perfil, perfil) }}{% endif %}
-Elige un empleado para ver su perfil y sus documentos.
+{% extends "base.html" %}
+{% block titulo %}Empleados{% endblock %}
+{% block contenido %}
+{% set nombres = {"administrativo": "Administrativo", "medico": "Médico", "enfermeria": "Enfermería"} %}
+<h1>Empleados{% if perfil %} · {{ nombres.get(perfil, perfil) }}{% endif %}</h1>
+<p class="sub">Elige un empleado para ver su perfil y sus documentos.</p>
+<nav class="pestanas">
+<a href="/empleados" class="{% if not perfil %}activa{% endif %}">Todos</a>
+{% for p in nombres %}<a href="/empleados?perfil={{ p }}" class="{% if perfil == p %}activa{% endif %}">{{ nombres[p] }}</a>{% endfor %}
+</nav>
+<form method="GET" action="/empleados" class="buscador">
+<input type="hidden" name="perfil" value="{{ perfil }}">
+<input type="text" name="q" value="{{ q }}" placeholder="Buscar por nombre, perfil o archivo">
+<button type="submit">Buscar</button>
+{% if q %}<a href="/empleados{% if perfil %}?perfil={{ perfil }}{% endif %}">Quitar filtro</a>{% endif %}
+</form>
+<!-- Tabla corta: la tabla grande de documentos está dentro del perfil de cada empleado -->
+<table>
+<tr><th>Empleado</th><th>Perfil</th><th>Documentos completos</th><th>Expediente</th><th>Acciones</th></tr>
+{% for f in filas %}
+<tr>
+<td><a href="/empleados/{{ f.emp.id }}">{{ f.emp.nombre }}</a></td>
+<td><span class="perfil {{ f.emp.perfil }}">{{ f.emp.perfil|capitalize }}</span></td>
+<td>{{ f.celdas|selectattr('estado','equalto','Completo')|list|length }} de {{ f.celdas|rejectattr('estado','equalto','No aplica')|list|length }}</td>
+<td class="{{ f.expediente|lower }}">{{ f.expediente }}</td>
+<td class="acciones-fila">
+<a href="/empleados/{{ f.emp.id }}">Ver perfil</a> ·
+<form method="POST" action="/empleados/eliminar/{{ f.emp.id }}">
+<button type="button" class="peligro" data-nombre="{{ f.emp.nombre }}" onclick="pedirConfirmacion(this)">Eliminar</button>
+</form>
+</td>
+</tr>
+{% endfor %}
+</table>
+{% if filas|length == 0 %}<p>{% if q %}No se encontraron empleados con "{{ q }}".{% else %}No hay empleados registrados.{% endif %}</p>{% endif %}
+<div class="acciones"><a class="boton gris" href="/">Volver al dashboard</a></div>
 
-Todos {% for p in nombres %}{{ nombres[p] }}{% endfor %}
-{{ q }}
- Buscar {% if q %}Quitar filtro{% endif %}
-{% for f in filas %} {% endfor %}
-Empleado	Perfil	Documentos completos	Expediente	Acciones
-{{ f.emp.nombre }}	{{ f.emp.perfil|capitalize }}	{{ f.celdas|selectattr('estado','equalto','Completo')|list|length }} de {{ f.celdas|rejectattr('estado','equalto','No aplica')|list|length }}	{{ f.expediente }}	Ver perfil
-Eliminar
-{% if filas|length == 0 %}
-{% if q %}No se encontraron empleados con "{{ q }}".{% else %}No hay empleados registrados.{% endif %}
-
-{% endif %}
-Volver al dashboard
+<!-- Ventana para confirmar el borrado (reemplaza la alerta del navegador) -->
+<div class="modal-fondo" id="modal-eliminar" hidden onclick="if(event.target===this)cerrarEliminar()">
+<div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="eliminar-titulo">
+<img class="modal-icono" src="{{ url_for('static', filename='iconos/alerta.svg') }}" alt="">
+<h2 id="eliminar-titulo">¿Eliminar empleado?</h2>
+<p>Se eliminará a <strong id="eliminar-nombre"></strong>. Solo se puede si todos sus documentos siguen en Pendiente y sin archivos.</p>
+<button type="button" class="peligro" onclick="confirmarEliminar()">Sí, eliminar</button>
+<button type="button" class="boton gris" onclick="cerrarEliminar()">Cancelar</button>
+</div>
+</div>
+<script>
+var formEliminar = null;
+function pedirConfirmacion(boton) {
+  formEliminar = boton.form;
+  document.getElementById("eliminar-nombre").textContent = boton.dataset.nombre;
+  document.getElementById("modal-eliminar").hidden = false;
+}
+function cerrarEliminar() { document.getElementById("modal-eliminar").hidden = true; formEliminar = null; }
+function confirmarEliminar() { if (formEliminar) { formEliminar.submit(); } }
+</script>
 {% endblock %}
