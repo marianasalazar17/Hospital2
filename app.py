@@ -119,9 +119,15 @@ def nuevo():
             conexion.close()
             return redirect("/empleados")
 
+    # NUEVO: tabla de requisitos
+    cursor.execute("SELECT perfil, documento FROM checklist ORDER BY id")
+    requisitos = {}
+    for r in cursor.fetchall():
+        requisitos.setdefault(r["perfil"], []).append(r["documento"])
+
     cursor.close()
     conexion.close()
-    return render_template("nuevo.html", error=error, perfiles=perfiles, datos=datos)
+    return render_template("nuevo.html", error=error, perfiles=perfiles, datos=datos, requisitos=requisitos)
 
 
 @app.route("/empleados/eliminar/<int:emp_id>", methods=["POST"])
