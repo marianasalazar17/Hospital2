@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block titulo %}Registrar empleado{% endblock %}
+{% block contenido %}
+<h1>Registrar empleado</h1>
+<p class="sub">Elige el perfil para ver qué documentos le va a exigir el sistema.</p>
+<div class="registro">
+<form method="POST" action="/empleados/nuevo" class="formulario">
+<label>Nombre</label>
+<input type="text" name="nombre" value="{{ datos.nombre }}">
+<label>Perfil</label>
+<select name="perfil" id="perfil">
+<option value="">-- Elige un perfil --</option>
+{% for p in perfiles %}
+<option value="{{ p }}" {% if datos.perfil == p %}selected{% endif %}>{{ p|capitalize }}</option>
+{% endfor %}
+</select>
+<label>Fecha de ingreso</label>
+<input type="date" name="fecha_ingreso" value="{{ datos.fecha_ingreso }}">
+<label>Correo</label>
+<input type="text" name="correo" value="{{ datos.correo }}" placeholder="nombre@hospital.com">
+<button type="submit">Guardar</button>
+</form>
+
+<section class="requisitos" aria-live="polite">
+<h2>Tabla de requisitos</h2>
+<p id="req-aviso">Elige un perfil para ver sus documentos.</p>
+<table id="req-tabla" hidden>
+<thead><tr><th>Documento</th><th>Estado al registrar</th></tr></thead>
+<tbody id="req-cuerpo"></tbody>
+</table>
+</section>
+</div>
+<script>
+// Requisitos por perfil, tomados de la tabla checklist
+var REQUISITOS = {{ requisitos|tojson }};
+var selPerfil = document.getElementById('perfil');
+function mostrarRequisitos() {
+  var lista = REQUISITOS[selPerfil.value] || [];
+  var cuerpo = document.getElementById('req-cuerpo');
+  var tabla = document.getElementById('req-tabla');
+  var aviso = document.getElementById('req-aviso');
+  cuerpo.innerHTML = '';
+  if (lista.length === 0) { tabla.hidden = true; aviso.hidden = false; return; }
+  lista.forEach(function (doc) {
+    var tr = document.createElement('tr');
+    var td1 = document.createElement('td'); td1.textContent = doc;
+    var td2 = document.createElement('td'); td2.textContent = 'Pendiente';
+    td2.className = 'pendiente';
+    tr.appendChild(td1); tr.appendChild(td2); cuerpo.appendChild(tr);
+  });
+  tabla.hidden = false; aviso.hidden = true;
+}
+selPerfil.addEventListener('change', mostrarRequisitos);
+mostrarRequisitos();
+</script>
+{% endblock %}
