@@ -1,5 +1,7 @@
 # app.py - Expedientes Digitales, Hospital de Diagnóstico (Desafío 2: MySQL)
 import io 
+import re
+import zipfile
 import mysql.connector 
 from datetime import datetime, date 
 from flask import Flask, render_template, request, redirect, send_file, abort 
@@ -342,6 +344,62 @@ def detalle(emp_id):
     for d in docs:
         d["imagen"] = d["documento"] in DOCUMENTOS_CON_IMAGEN
     return render_template("detalle.html", emp=emp, docs=docs)
+
+
+# ---------------------------------------------------------------
+# EXTRA: descargar todo el expediente de un empleado en un solo ZIP
+# ---------------------------------------------------------------
+def nombre_seguro(texto):
+    # Quita caracteres que Windows no acepta en nombres de archivo o carpeta
+    return re.sub(r'[\\/:*?"<>|]', "_", str(texto)).strip() or "archivo"
+
+
+@app.route("/empleados/<int:emp_id>/descargar")
+def descargar_expediente(emp_id):
+    conexion = conectar()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM empleados WHERE id = %s", (emp_id,))
+    emp = cursor.fetchone()
+    if emp is None:
+        cursor.close()
+        conexion.close()
+        abort(404)
+    cursor.execute("SELECT id, documento, estado FROM documentos WHERE empleado_id = %s ORDER BY id", (emp_id,))
+    docs = cursor.fetchall()
+    # Aquí sí se trae el contenido (LONGBLOB) porque se va a meter en el ZIP
+    cursor.execute(
+        "SELECT a.documento_id, a.nombre_original, a.version, a.fecha_vencimiento, a.fecha_subida, a.contenido "
+        "FROM archivos a JOIN documentos d ON d.id = a.documento_id "
+        "WHERE d.empleado_id = %s ORDER BY a.documento_id, a.version", (emp_id,))
+    archivos = cursor.fetchall()
+    cursor.close()
+    conexion.close()
+
+    # Se arma el ZIP en memoria (io.BytesIO), igual que la descarga de un solo archivo
+    memoria = io.BytesIO()
+    with zipfile.ZipFile(memoria, "w", zipfile.ZIP_DEFLATED) as zipf:
+        resumen = ["EXPEDIENTE DIGITAL - HOSPITAL DE DIAGNÓSTICO", "",
+                   "Nombre: " + str(emp["nombre"]),
+                   "Perfil: " + str(emp["perfil"]).capitalize(),
+                   "Fecha de ingreso: " + str(emp["fecha_ingreso"]),
+                   "Correo: " + str(emp["correo"]),
+                   "Descargado: " + datetime.now().strftime("%Y-%m-%d %H:%M"), "",
+                   "DOCUMENTOS"]
+        for d in docs:
+            suyos = [a for a in archivos if a["documento_id"] == d["id"]]
+            ultima = suyos[-1]["version"] if suyos else 0
+            resumen.append("- " + d["documento"] + ": " + d["estado"] + " (" + str(len(suyos)) + (" versión)" if len(suyos) == 1 else " versiones)"))
+            for a in suyos:
+                # Carpeta por documento; cada versión con su número delante
+                ruta = nombre_seguro(d["documento"]) + "/v" + str(a["version"]) + "_" + nombre_seguro(a["nombre_original"])
+                zipf.writestr(ruta, a["contenido"])
+                estado = estado_version(a["version"], ultima, a["fecha_vencimiento"])
+                vence = " · vence " + str(a["fecha_vencimiento"]) if a["fecha_vencimiento"] else ""
+                resumen.append("    v" + str(a["version"]) + " " + a["nombre_original"] + " · " + estado + vence)
+        zipf.writestr("resumen.txt", "\r\n".join(resumen).encode("utf-8-sig"))
+    memoria.seek(0)
+    return send_file(memoria, as_attachment=True, mimetype="application/zip",
+                     download_name="Expediente_" + nombre_seguro(emp["nombre"]) + ".zip")
 
 
 # ---------------------------------------------------------------

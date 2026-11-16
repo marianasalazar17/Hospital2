@@ -24,5 +24,8 @@ Expediente {{ 'completo' if pendientes == 0 else 'incompleto' }}{% if pendientes
 </tr>
 {% endfor %}
 </table>
-<div class="acciones"><a class="boton gris" href="/empleados">Volver al listado</a></div>
+<div class="acciones">
+<a class="boton" href="/empleados/{{ emp.id }}/descargar">Descargar expediente (ZIP)</a>
+<a class="boton gris" href="/empleados">Volver al listado</a>
+</div>
 {% endblock %}
