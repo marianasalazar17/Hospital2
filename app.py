@@ -5,6 +5,10 @@ import zipfile
 import mysql.connector 
 from datetime import datetime, date 
 from flask import Flask, render_template, request, redirect, send_file, abort, session
+import os
+import msal
+from werkzeug.security import check_password_hash
+
 
 app = Flask(__name__) 
 
