@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block titulo %}Iniciar sesión{% endblock %}
+{% block contenido %}
+<h1>Iniciar sesión</h1>
+<form method="post" action="/login">
+    <label>Correo
+        <input type="email" name="correo" required>
+    </label>
+    <label>Contraseña
+        <input type="password" name="clave" required>
+    </label>
+    <button type="submit">Entrar</button>
+</form>
+<p>o</p>
+<a class="boton" href="/login/microsoft">Entrar con Microsoft</a>
+{% endblock %}
