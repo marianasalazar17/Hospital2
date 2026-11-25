@@ -96,3 +96,25 @@ fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 UNIQUE (documento_id, version), 
 FOREIGN KEY (documento_id) REFERENCES documentos(id) ON DELETE CASCADE 
 ) ENGINE=InnoDB;
+
+-- Parte 2 (Mariana): roles y bitácora
+-- usuarios guarda el correo, el rol (editor o visor) y la contraseña ya cifrada (hash).
+-- IF NOT EXISTS: así, volver a importar este archivo NO borra a los usuarios.
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    correo VARCHAR(120) NOT NULL UNIQUE,
+    nombre VARCHAR(100) NOT NULL,
+    rol VARCHAR(10) NOT NULL DEFAULT 'visor',
+    contrasena_hash VARCHAR(255) NULL
+);
+
+-- bitácora: quién hizo qué y cuándo
+CREATE TABLE IF NOT EXISTS bitacora (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+    usuario VARCHAR(120),
+    accion VARCHAR(50),
+    detalle VARCHAR(255)
+);
+-- OJO: los usuarios con su hash NO se suben a GitHub (el repositorio es público).
+-- Cada persona los inserta en phpMyAdmin con su propio hash.
