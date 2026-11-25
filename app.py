@@ -8,6 +8,7 @@ from flask import Flask, render_template, request, redirect, send_file, abort, s
 import os
 import msal
 from werkzeug.security import check_password_hash
+from functools import wraps
 
 
 app = Flask(__name__)
@@ -66,6 +67,18 @@ def obtener_perfiles(cursor):
         lista.append(fila["perfil"])
     return lista
 
+# ---------------------------------------------------------------
+# MARIANA SALAZAR: roles. Solo el rol "editor" puede cambiar datos; un visor recibe 403
+# ---------------------------------------------------------------
+def solo_editor(f):
+    @wraps(f)
+    def envoltura(*args, **kwargs):
+        if session.get("rol") != "editor":
+            abort(403)
+        return f(*args, **kwargs)
+    return envoltura
+
+
 @app.errorhandler(mysql.connector.Error)
 def error_base_datos(error):
     # Si MySQL está apagado, la página sigue viva y avisa en vez de romperse
@@ -82,6 +95,7 @@ def inicio():
 # FIORELLA FUNES: registrar empleado (con validación) y eliminar
 # ---------------------------------------------------------------
 @app.route("/empleados/nuevo", methods=["GET", "POST"])
+@solo_editor
 def nuevo():
     conexion = conectar()
     cursor = conexion.cursor(dictionary=True)
@@ -127,6 +141,7 @@ def nuevo():
                     "INSERT INTO documentos (empleado_id, documento, estado) VALUES (%s, %s, %s)",
                     (emp_id, r["documento"], "Pendiente"))
             conexion.commit()
+            registrar("Registrar colaborador", nombre)
             cursor.close()
             conexion.close()
             return redirect("/empleados")
@@ -143,6 +158,7 @@ def nuevo():
 
 
 @app.route("/empleados/eliminar/<int:emp_id>", methods=["POST"])
+@solo_editor
 def eliminar(emp_id):
     conexion = conectar()
     cursor = conexion.cursor(dictionary=True)
@@ -174,6 +190,7 @@ def eliminar(emp_id):
     # ON DELETE CASCADE borra solo los documentos del empleado (no quedan huérfanos)
     cursor.execute("DELETE FROM empleados WHERE id = %s", (emp_id,))
     conexion.commit()
+    registrar("Eliminar colaborador", emp["nombre"])
     cursor.close()
     conexion.close()
     return redirect("/empleados")
@@ -183,6 +200,7 @@ def eliminar(emp_id):
 # FIORELLA FUNES: subir un archivo (PDF, Word o imagen del Título) con validaciones y versiones
 # ---------------------------------------------------------------
 @app.route("/documentos/<int:doc_id>/subir", methods=["GET", "POST"])
+@solo_editor
 def subir(doc_id):
     conexion = conectar()
     cursor = conexion.cursor(dictionary=True)
@@ -245,6 +263,7 @@ def subir(doc_id):
                 (doc_id, doc["documento"], archivo.filename, nueva, fecha_venc, contenido))
             cursor.execute("UPDATE documentos SET estado = %s WHERE id = %s", ("Completo", doc_id))
             conexion.commit()
+            registrar("Subir documento", doc["nombre"] + ": " + doc["documento"] + " (versión " + str(nueva) + ")")
             cursor.close()
             conexion.close()
             if es_imagen(archivo.filename):
@@ -436,6 +455,7 @@ def ver_checklist():
 # FERNANDA POCASANGRE: modificar el estado de un documento (con validación)
 # ---------------------------------------------------------------
 @app.route("/documentos/editar/<int:doc_id>", methods=["GET", "POST"])
+@solo_editor
 def editar(doc_id):
     conexion = conectar()
     cursor = conexion.cursor(dictionary=True)
@@ -456,6 +476,7 @@ def editar(doc_id):
         else:
             cursor.execute("UPDATE documentos SET estado = %s WHERE id = %s", (estado, doc_id))
             conexion.commit()
+            registrar("Cambiar estado", doc["nombre"] + ": " + doc["documento"] + " a " + estado)
             cursor.close()
             conexion.close()
             return redirect("/empleados")
@@ -676,6 +697,58 @@ def listar_documentos():
                 sin_archivo = sin_archivo + 1
             mostrar.append(f)
     return render_template("documentos.html", filas=mostrar, total=len(mostrar), sin_archivo=sin_archivo, tipo=tipo)
+
+# ---------------------------------------------------------------
+# MARIANA SALAZAR: bitácora (quién hizo qué y cuándo) y portal de inicio
+# ---------------------------------------------------------------
+def registrar(accion, detalle):
+    # Guarda una fila en la tabla bitacora con el usuario que tiene la sesión abierta
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO bitacora (usuario, accion, detalle) VALUES (%s, %s, %s)",
+        (session.get("correo", "desconocido"), accion, detalle),
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+
+@app.route("/bitacora")
+def ver_bitacora():
+    conn = conectar()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT fecha, usuario, accion, detalle FROM bitacora ORDER BY fecha DESC")
+    filas = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template("bitacora.html", filas=filas)
+
+
+@app.route("/login", methods=["GET", "POST"])
+def portal():
+    error = None
+    if request.method == "POST":
+        correo = request.form.get("correo", "").strip().lower()
+        clave = request.form.get("clave", "")
+        conn = conectar()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            "SELECT nombre, rol, contrasena_hash FROM usuarios WHERE correo = %s",
+            (correo,),
+        )
+        usuario = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        if (usuario and usuario["contrasena_hash"]
+                and check_password_hash(usuario["contrasena_hash"], clave)):
+            session["correo"] = correo
+            session["nombre"] = usuario["nombre"]
+            session["rol"] = usuario["rol"]
+            return redirect("/")
+        error = "Correo o contraseña incorrectos."
+    return render_template("login.html", error=error)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
