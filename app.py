@@ -10,7 +10,13 @@ import msal
 from werkzeug.security import check_password_hash
 
 
-app = Flask(__name__) 
+app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "cambia-esta-clave")
+MS_CLIENT_ID = os.environ.get("MS_CLIENT_ID")
+MS_CLIENT_SECRET = os.environ.get("MS_CLIENT_SECRET")
+MS_TENANT_ID = os.environ.get("MS_TENANT_ID", "common")
+MS_REDIRECT_URI = os.environ.get("MS_REDIRECT_URI", "http://localhost:5000/callback")
+
 
 # ---- Configuración de archivos (Tarea 3) ---- 
 EXTENSIONES_PERMITIDAS = (".pdf", ".doc", ".docx") 
