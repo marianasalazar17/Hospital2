@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titulo %}Bitácora{% endblock %}
+{% block contenido %}
+<h1>Bitácora de actividades</h1>
+<p class="sub">Quién hizo qué y cuándo.</p>
+<table>
+<tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Detalle</th></tr>
+{% for f in filas %}
+<tr>
+<td>{{ f.fecha }}</td>
+<td>{{ f.usuario }}</td>
+<td>{{ f.accion }}</td>
+<td>{{ f.detalle }}</td>
+</tr>
+{% else %}
+<tr><td colspan="4">Todavía no hay actividad registrada.</td></tr>
+{% endfor %}
+</table>
+<div class="acciones">
+<a class="boton gris" href="/">Volver al dashboard</a>
+</div>
+{% endblock %}
