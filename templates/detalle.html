@@ -15,11 +15,11 @@ Expediente {{ 'completo' if pendientes == 0 else 'incompleto' }}{% if pendientes
 {% for d in docs %}
 <tr>
 <td>{{ d.documento }}</td>
-<td class="{{ d.estado|lower|replace(' ', '') }}"><a href="/documentos/editar/{{ d.id }}">{{ d.estado }}</a></td>
+<td class="{{ d.estado|lower|replace(' ', '') }}">{% if session.get('rol') == 'editor' %}<a href="/documentos/editar/{{ d.id }}">{{ d.estado }}</a>{% else %}{{ d.estado }}{% endif %}</td>
 <td>{{ d.versiones }}</td>
 <td>
 {% if d.imagen %}<a href="/documentos/{{ d.id }}/imagen">Ver imagen</a>{% else %}<a href="/documentos/{{ d.id }}/versiones">Ver versiones</a>{% endif %}
- | <a href="/documentos/{{ d.id }}/subir">Subir</a>
+{% if session.get('rol') == 'editor' %} | <a href="/documentos/{{ d.id }}/subir">Subir</a>{% endif %}
 </td>
 </tr>
 {% endfor %}
